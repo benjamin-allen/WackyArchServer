@@ -1,11 +1,19 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.EntityFrameworkCore;
+using WackyArchServer.Model;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
+#if DEBUG
+builder.Services.AddDbContextFactory<WAContext>(options =>
+{
+    options.UseSqlite($"DataSource=wackyarch_dev.sqlite");
+});
+#endif
 
 var app = builder.Build();
 
