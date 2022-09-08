@@ -1,0 +1,53 @@
+﻿<textarea id="codeBox" rows="@rows" cols="@cols"
+    @oninput="setCodeText"
+    @onchange="testAssemble"
+    @onkeydown="checkKey"></textarea>
+
+@code {
+    [Parameter]
+    public int rows { get; set; } = 30;
+    [Parameter]
+    public int cols { get; set; } = 18;
+    private int minRows { get; set; } = 4;
+    private int minCols { get; set; } = 18;
+
+
+    private string codeText { get; set; }
+    private ElementReference codeBox { get; set; }
+
+    protected override void OnInitialized()
+    {
+        rows = Math.Min(rows, minRows);
+        cols = Math.Min(cols, minCols);
+    }
+
+    /// <summary>
+    /// Attempt to assemble the code in the inputbox. If there's an error, 
+    /// mark the line number and error string.
+    /// </summary>
+    /// <param name="args"></param>
+    public void testAssemble(ChangeEventArgs args)
+    {
+        try
+        {
+            Assembler.Assemble(new CPU(), (string)args.Value, out var pcLineMap);
+        }
+        catch (AssemblerException e)
+        {
+            Console.WriteLine($"Line {e.LineNumber}: {e.ShortMessage}");
+        }
+    }
+
+    public void setCodeText(ChangeEventArgs args)
+    {
+        codeText = (string)args.Value;
+    }
+
+    public void checkKey(KeyboardEventArgs args)
+    {
+        if (args.Key == "Enter" || args.Key == "NumpadEnter")
+        {
+            testAssemble(new ChangeEventArgs { Value = codeText });
+        }
+    }
+}

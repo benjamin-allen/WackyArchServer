@@ -1,7 +1,47 @@
-﻿<PageTitle>TestComponent</PageTitle>
+﻿@page "/test"
+@using System.Reflection
+@using System.ComponentModel.DataAnnotations
 
-<h3>Hello, test component!</h3>
+<PageTitle>Component Tester</PageTitle>
+
+<h3>Select a component to test</h3>
+
+<EditForm EditContext="@editContext" OnValidSubmit="@handleValidSubmit">
+    <InputSelect @bind-Value="selectedComponent">
+        @foreach(Type c in components)
+        {
+            <option value="@c.FullName">@c.Name</option>
+        }
+    </InputSelect>
+    <button type="submit">Submit</button>
+</EditForm>
+
+<hr />
+<DynamicComponent Type="@selectedComponentType" Parameters="@parameters"></DynamicComponent>
 
 @code {
+    private EditContext editContext;
+    private string selectedComponent;
+    private List<Type> components;
+    private Type selectedComponentType;
+    private Dictionary<string, object> parameters;
 
+    protected override void OnInitialized()
+    {
+        components = Assembly.GetExecutingAssembly().GetTypes()
+            .Where(t => t.Namespace == "WackyArchServer.UIComponents")
+            .Where(t => t.FullName != this.GetType().FullName)
+            .Where(t => typeof(IComponent).IsAssignableFrom(t))
+            .ToList();
+        selectedComponent = components.First().FullName;
+        selectedComponentType = Type.GetType(selectedComponent);
+        parameters = new Dictionary<string, object>();
+        editContext = new EditContext(selectedComponent);
+    }
+
+    private void handleValidSubmit()
+    {
+        selectedComponentType = Type.GetType(selectedComponent);
+        parameters = new Dictionary<string, object>();
+    }
 }
