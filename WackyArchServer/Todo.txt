@@ -10,8 +10,8 @@
 		[] Monospace font
 
 	[] CPU Info Box
-		[] Display CPU status
-		[] Provide Controls
+		[x] Display CPU status
+		[x] Provide Controls
 
 	[] Pipes
 

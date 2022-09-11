@@ -6,14 +6,35 @@
             <tr><td>@register.Name</td><td>@register.Data.Value</td><td>@register.Data.Value.ToString("x")</td></tr>
         }
     </table>
-    <div cpustatus>
-        CPU: @cpuStatus
+    <div class="cpustatus">
+        CPU: @CpuStatus
     </div>
+</div>
+<div class="controls">
+    <button @onclick="LoadButtonPressed">Load Program</button><br/>
+    <button @onclick="StepButtonPressed">Step</button><br/>
+    <button @onclick="RunButtonPressed">Run</button><br/>
+    <button @onclick="StopButtonPressed">Stop</button><br/>
+    <button @onclick="SubmitButtonPressed">Submit Solution</button><br/>
+    <button @onclick="BackButtonPressed">Exit Challenge</button><br/>
 </div>
 
 @code {
     [Parameter]
     public CPU Cpu { get; set; }
 
-    public string cpuStatus { get; set; }
+    [Parameter]
+    public EventCallback LoadButtonPressed { get; set; }
+    [Parameter]
+    public EventCallback StepButtonPressed { get; set; }
+    [Parameter]
+    public EventCallback RunButtonPressed { get; set; }
+    [Parameter]
+    public EventCallback StopButtonPressed { get; set; }
+    [Parameter]
+    public EventCallback SubmitButtonPressed { get; set; }
+    [Parameter]
+    public EventCallback BackButtonPressed { get; set; }
+
+    public string CpuStatus { get; set; }
 }

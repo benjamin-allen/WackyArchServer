@@ -54,7 +54,8 @@
     private Dictionary<Type, Dictionary<string, object>> parametersCollection = new Dictionary<Type, Dictionary<string, object>>
     {
         { typeof(CodeBox), new Dictionary<string, object> { { "Cpu", cpu } } },
-        { typeof(CPUInfo), new Dictionary<string, object> { { "Cpu", cpu } } }
+        { typeof(CPUInfo), new Dictionary<string, object> { { "Cpu", cpu } } },
+        { typeof(FilledPort), new Dictionary<string, object> { { "Port", new WackyArch.Components.FilledPort(new List<Word> { new Word { Value = 12 }, new Word { Value = 13 }, new Word { Value = 14 } }, new Pipe(), "Test") } } }
     };
     #endregion
 }
