@@ -1,5 +1,19 @@
-﻿<h3>CPUInfo</h3>
+﻿<div class="cpuinfo-mainbox">
+    <table>
+        <tr><th></th><th>Dec</th><th>Hex</th></tr>
+        @foreach(var register in Cpu.Registers)
+        {
+            <tr><td>@register.Name</td><td>@register.Data.Value</td><td>@register.Data.Value.ToString("x")</td></tr>
+        }
+    </table>
+    <div cpustatus>
+        CPU: @cpuStatus
+    </div>
+</div>
 
 @code {
+    [Parameter]
+    public CPU Cpu { get; set; }
 
+    public string cpuStatus { get; set; }
 }

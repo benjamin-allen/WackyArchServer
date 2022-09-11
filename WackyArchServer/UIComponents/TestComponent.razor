@@ -34,14 +34,27 @@
             .Where(t => typeof(IComponent).IsAssignableFrom(t))
             .ToList();
         selectedComponent = components.First().FullName;
-        selectedComponentType = Type.GetType(selectedComponent);
-        parameters = new Dictionary<string, object>();
+        handleValidSubmit();
         editContext = new EditContext(selectedComponent);
     }
 
     private void handleValidSubmit()
     {
         selectedComponentType = Type.GetType(selectedComponent);
-        parameters = new Dictionary<string, object>();
+        parametersCollection.TryGetValue(selectedComponentType, out parameters);
+        if (parameters == null)
+        {
+            parameters = new Dictionary<string, object>();
+        }
     }
+
+
+    #region Testing Data
+    private static CPU cpu = new CPU();
+    private Dictionary<Type, Dictionary<string, object>> parametersCollection = new Dictionary<Type, Dictionary<string, object>>
+    {
+        { typeof(CodeBox), new Dictionary<string, object> { { "Cpu", cpu } } },
+        { typeof(CPUInfo), new Dictionary<string, object> { { "Cpu", cpu } } }
+    };
+    #endregion
 }

@@ -1,7 +1,13 @@
-﻿<textarea id="codeBox" rows="@rows" cols="@cols"
-    @oninput="setCodeText"
-    @onchange="testAssemble"
-    @onkeydown="checkKey"></textarea>
+﻿<div class="codebox-container">
+    <textarea id="codeBox" rows="@rows" cols="@cols"
+        @oninput="setCodeText"
+        @onchange="testAssemble"
+        @onkeydown="checkKey"></textarea>
+</div>
+<div class="codebox-info" >
+    <p>@infoMessage</p>
+</div>
+
 
 @code {
     [Parameter]
@@ -11,9 +17,12 @@
     private int minRows { get; set; } = 4;
     private int minCols { get; set; } = 18;
 
+    [Parameter, EditorRequired]
+    public CPU Cpu { get; set; }
 
-    private string codeText { get; set; }
-    private ElementReference codeBox { get; set; }
+    public string CodeText { get; set; }
+
+    private string infoMessage { get; set; }
 
     protected override void OnInitialized()
     {
@@ -30,24 +39,30 @@
     {
         try
         {
-            Assembler.Assemble(new CPU(), (string)args.Value, out var pcLineMap);
+            Assembler.Assemble(Cpu, (string)args.Value, out _);
+            infoMessage = "";
         }
         catch (AssemblerException e)
         {
-            Console.WriteLine($"Line {e.LineNumber}: {e.ShortMessage}");
+            infoMessage = $"[Line {e.LineNumber}] {e.ShortMessage}";
         }
     }
 
-    public void setCodeText(ChangeEventArgs args)
+    private void setCodeText(ChangeEventArgs args)
     {
-        codeText = (string)args.Value;
+        CodeText = (string)args.Value;
     }
 
     public void checkKey(KeyboardEventArgs args)
     {
         if (args.Key == "Enter" || args.Key == "NumpadEnter")
         {
-            testAssemble(new ChangeEventArgs { Value = codeText });
+            testAssemble(new ChangeEventArgs { Value = CodeText });
         }
+    }
+
+    public void UpdateLinePointerAsync(int line)
+    {
+        Console.WriteLine($"Highlight line {line}");
     }
 }
