@@ -1,0 +1,69 @@
+﻿@page "/alpha"
+<h3>AlphaArchitecture</h3>
+
+<CodeBox Cpu="Cpu" @ref="codeBox"></CodeBox>
+
+<CPUInfo Cpu="Cpu" LoadButtonPressed="LoadProgram" ResetButtonPressed="Reset" StepButtonPressed="Step"></CPUInfo>
+@code {
+    public InterpreterCPU Cpu { get; set; }
+    private List<ICyclable> cyclables;
+
+    private CodeBox codeBox;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        Cpu = new InterpreterCPU();
+        codeBox.CodeText = "movc 10";
+
+        cyclables = new List<ICyclable> { Cpu };
+    }
+
+    private void LoadProgram()
+    {
+        var codeText = codeBox.CodeText;
+        try
+        {
+            Reset();
+            codeBox.SetInfoMessage("");
+            Cpu.Load(codeBox.CodeText);
+            codeBox.SetInfoMessage("Program Loaded");
+        }
+        catch (AssemblerException ae)
+        {
+            codeBox.SetInfoMessage(ae.ShortMessage);
+        }
+    }
+
+    private void Reset()
+    {
+        cyclables.ForEach(c => c.Reset());
+        codeBox.SetInfoMessage("System Reset");
+    }
+
+    private void Step()
+    {
+        try
+        {
+            codeBox.SetInfoMessage("");
+            cyclables.ForEach(c => c.Cycle());
+            if (Cpu.IsHalted)
+            {
+
+            }
+            else if (false /* if the expectation port has no more data*/)
+            {
+                codeBox.SetInfoMessage("Tests passed!");
+            }
+            else
+            {
+                codeBox.SetInfoMessage("Waiting for output...");
+            }
+        }
+        catch (ComponentException cex)
+        {
+            codeBox.SetInfoMessage(cex.ShortMessage);
+            Cpu.IsErrored = true;
+        }
+    }
+}

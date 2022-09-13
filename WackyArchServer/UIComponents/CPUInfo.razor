@@ -14,13 +14,13 @@
     <button @onclick="LoadButtonPressed">Load Program</button><br/>
     <button @onclick="StepButtonPressed">Step</button><br/>
     <button @onclick="RunButtonPressed">Run</button><br/>
-    <button @onclick="StopButtonPressed">Stop</button><br/>
+    <button @onclick="ResetButtonPressed">Reset</button><br/>
     <button @onclick="SubmitButtonPressed">Submit Solution</button><br/>
     <button @onclick="BackButtonPressed">Exit Challenge</button><br/>
 </div>
 
 @code {
-    [Parameter]
+    [Parameter, EditorRequired]
     public CPU Cpu { get; set; }
 
     [Parameter]
@@ -30,7 +30,7 @@
     [Parameter]
     public EventCallback RunButtonPressed { get; set; }
     [Parameter]
-    public EventCallback StopButtonPressed { get; set; }
+    public EventCallback ResetButtonPressed { get; set; }
     [Parameter]
     public EventCallback SubmitButtonPressed { get; set; }
     [Parameter]

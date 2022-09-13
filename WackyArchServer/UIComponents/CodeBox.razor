@@ -53,7 +53,7 @@
         CodeText = (string)args.Value;
     }
 
-    public void checkKey(KeyboardEventArgs args)
+    private void checkKey(KeyboardEventArgs args)
     {
         if (args.Key == "Enter" || args.Key == "NumpadEnter")
         {
@@ -61,8 +61,13 @@
         }
     }
 
-    public void UpdateLinePointerAsync(int line)
+    public void UpdateLinePointer(int line)
     {
         Console.WriteLine($"Highlight line {line}");
+    }
+
+    public void SetInfoMessage(string infoMessage)
+    {
+        this.infoMessage = infoMessage;
     }
 }
