@@ -1,0 +1,14 @@
+﻿<div class="PortInfo">
+    @Port.Name [@Port.ExpectedData.Count]
+</div>
+<div class="PortContent">
+    @foreach(Word data in Port.ExpectedData)
+    {
+        <pre>@data.Value</pre>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public WackyArch.Components.ExpectationPort Port { get; set; }
+}
