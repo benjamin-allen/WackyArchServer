@@ -3,7 +3,7 @@
         <tr><th></th><th>Dec</th><th>Hex</th></tr>
         @foreach(var register in Cpu.Registers)
         {
-            <tr><td>@register.Name</td><td>@register.Data.Value</td><td>@register.Data.Value.ToString("x")</td></tr>
+            <tr><td>@register.Name</td><td>@register.Data.Value</td><td>@((register.Data.Value & 0xFFF).ToString("x"))</td></tr>
         }
     </table>
     <div class="cpustatus">
@@ -11,10 +11,10 @@
     </div>
 </div>
 <div class="controls">
-    <button @onclick="LoadButtonPressed">Load Program</button><br/>
-    <button @onclick="StepButtonPressed">Step</button><br/>
-    <button @onclick="RunButtonPressed">Run</button><br/>
-    <button @onclick="ResetButtonPressed">Reset</button><br/>
+    <button @onclick="args => RunEvent(LoadButtonPressed)" disabled=@loadButtonDisabled>Load Program</button><br/>
+    <button @onclick="args => RunEvent(StepButtonPressed)" disabled=@stepButtonDisabled>Step</button><br/>
+    <button @onclick="args => RunEvent(RunButtonPressed)" disabled=@runButtonDisabled>Run</button><br/>
+    <button @onclick="args => RunEvent(ResetButtonPressed)" disabled=@resetButtonDisabled>Reset</button><br/>
     <button @onclick="SubmitButtonPressed">Submit Solution</button><br/>
     <button @onclick="BackButtonPressed">Exit Challenge</button><br/>
 </div>
@@ -37,4 +37,52 @@
     public EventCallback BackButtonPressed { get; set; }
 
     public string CpuStatus { get; set; }
+
+    private bool loadButtonDisabled = false;
+    private bool stepButtonDisabled = false;
+    private bool runButtonDisabled = false;
+    private bool resetButtonDisabled = false;
+
+    private async void RunEvent(EventCallback callback)
+    {
+        await callback.InvokeAsync();
+        UpdateStateBasedOnCpuStatus();
+    }
+
+    // This is a terrible tiny "state machine" that's not a state machine. I'm sorry, I'm just lazy.
+    void UpdateStateBasedOnCpuStatus()
+    {
+        if (Cpu.PcLineMap.Count == 0)
+        {
+            CpuStatus = "NO PROGRAM";
+            loadButtonDisabled = false;
+            stepButtonDisabled = true;
+            runButtonDisabled = true;
+            resetButtonDisabled = true;
+        }
+        else if (Cpu.IsHalted && !Cpu.IsErrored)
+        {
+            CpuStatus = "READY";
+            loadButtonDisabled = false;
+            stepButtonDisabled = false;
+            runButtonDisabled = false;
+            resetButtonDisabled = false;
+        }
+        else if (Cpu.IsErrored)
+        {
+            CpuStatus = "ERROR";
+            loadButtonDisabled = false;
+            stepButtonDisabled = true;
+            runButtonDisabled = true;
+            resetButtonDisabled = false;
+        }
+        else
+        {
+            CpuStatus = "RUNNING";
+            loadButtonDisabled = true;
+            stepButtonDisabled = false;
+            runButtonDisabled = false;
+            resetButtonDisabled = false;
+        }
+    }
 }

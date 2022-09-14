@@ -30,3 +30,11 @@
 
 [] WackyArch
 	[] "Unlock" Instruction
+
+
+[] WEIRD BUG
+	[] Go to alphaarch, enter this program:
+	subc 1
+	addc 20
+
+	then step, and step again, and notice that the first instruction is execucted twice?

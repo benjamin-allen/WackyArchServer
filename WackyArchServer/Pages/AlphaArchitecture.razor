@@ -3,7 +3,8 @@
 
 <CodeBox Cpu="Cpu" @ref="codeBox"></CodeBox>
 
-<CPUInfo Cpu="Cpu" LoadButtonPressed="LoadProgram" ResetButtonPressed="Reset" StepButtonPressed="Step"></CPUInfo>
+<CPUInfo Cpu="Cpu" LoadButtonPressed="LoadProgram" ResetButtonPressed="Reset" StepButtonPressed="Step" RunButtonPressed="Run"></CPUInfo>
+
 @code {
     public InterpreterCPU Cpu { get; set; }
     private List<ICyclable> cyclables;
@@ -14,7 +15,6 @@
     {
         base.OnInitialized();
         Cpu = new InterpreterCPU();
-        codeBox.CodeText = "movc 10";
 
         cyclables = new List<ICyclable> { Cpu };
     }
@@ -64,6 +64,16 @@
         {
             codeBox.SetInfoMessage(cex.ShortMessage);
             Cpu.IsErrored = true;
+        }
+    }
+
+    private async void Run(object state)
+    {
+        while(Cpu.IsHalted == false && Cpu.IsErrored == false)
+        {
+            Step();
+            StateHasChanged();
+            await Task.Delay(1);
         }
     }
 }
