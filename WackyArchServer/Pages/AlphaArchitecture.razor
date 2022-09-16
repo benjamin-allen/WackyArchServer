@@ -5,8 +5,13 @@
 
 <CPUInfo Cpu="Cpu" LoadButtonPressed="LoadProgram" ResetButtonPressed="Reset" StepButtonPressed="Step" RunButtonPressed="Run"></CPUInfo>
 
+<FilledPort Port="Top"></FilledPort>
+<FilledPort Port="Bottom"></FilledPort>
+
 @code {
     public InterpreterCPU Cpu { get; set; }
+    public WackyArch.Components.FilledPort Top { get; set; }
+    public WackyArch.Components.FilledPort Bottom { get; set; }
     private List<ICyclable> cyclables;
 
     private CodeBox codeBox;
@@ -14,14 +19,18 @@
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        Cpu = new InterpreterCPU();
+        Top = new WackyArch.Components.FilledPort(new int[] { 1, 2, 3, 4, 5, 6 }.Select(x => new Word() { Value = x }).ToList(), new Pipe(), "TOP");
+        Bottom = new WackyArch.Components.FilledPort(new int[] { 9, 8, 7, 6, 5, 10 }.Select(x => new Word() { Value = x }).ToList(), new Pipe(), "BOTTOM");
+        Cpu = new InterpreterCPU(new Port[] { Top, Bottom });
 
-        cyclables = new List<ICyclable> { Cpu };
+        cyclables = new List<ICyclable> { Cpu, Top, Bottom };
     }
 
     private void LoadProgram()
     {
         var codeText = codeBox.CodeText;
+        if (string.IsNullOrWhiteSpace(codeText)) return;
+
         try
         {
             Reset();

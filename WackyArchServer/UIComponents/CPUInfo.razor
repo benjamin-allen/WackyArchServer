@@ -49,6 +49,12 @@
         UpdateStateBasedOnCpuStatus();
     }
 
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        UpdateStateBasedOnCpuStatus();
+    }
+
     // This is a terrible tiny "state machine" that's not a state machine. I'm sorry, I'm just lazy.
     void UpdateStateBasedOnCpuStatus()
     {
