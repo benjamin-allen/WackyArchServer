@@ -7,23 +7,27 @@
 
 <FilledPort Port="Top"></FilledPort>
 <FilledPort Port="Bottom"></FilledPort>
+<ExpectationPort Port="Output"></ExpectationPort>
 
 @code {
     public InterpreterCPU Cpu { get; set; }
     public WackyArch.Components.FilledPort Top { get; set; }
     public WackyArch.Components.FilledPort Bottom { get; set; }
+    public WackyArch.Components.ExpectationPort Output { get; set; }
     private List<ICyclable> cyclables;
 
-    private CodeBox codeBox;
+    private WackyArchServer.UIComponents.CodeBox codeBox;
 
     protected override void OnInitialized()
     {
         base.OnInitialized();
         Top = new WackyArch.Components.FilledPort(new int[] { 1, 2, 3, 4, 5, 6 }.Select(x => new Word() { Value = x }).ToList(), new Pipe(), "TOP");
         Bottom = new WackyArch.Components.FilledPort(new int[] { 9, 8, 7, 6, 5, 10 }.Select(x => new Word() { Value = x }).ToList(), new Pipe(), "BOTTOM");
-        Cpu = new InterpreterCPU(new Port[] { Top, Bottom });
+        Output = new WackyArch.Components.ExpectationPort(new int[] { 0, 0, 0, 0, 0, 1 }.Select(x => new Word() { Value = x }).ToList(), "OUTPUT");
 
-        cyclables = new List<ICyclable> { Cpu, Top, Bottom };
+        Cpu = new InterpreterCPU(new Port[] { Top, Bottom, Output });
+
+        cyclables = new List<ICyclable> { Cpu, Top, Bottom, Output };
     }
 
     private void LoadProgram()
@@ -58,9 +62,9 @@
             cyclables.ForEach(c => c.Cycle());
             if (Cpu.IsHalted)
             {
-
+                codeBox.SetInfoMessage("Program Complete");
             }
-            else if (false /* if the expectation port has no more data*/)
+            else if (Output.ExpectedData.Count == 0)
             {
                 codeBox.SetInfoMessage("Tests passed!");
             }
@@ -78,11 +82,11 @@
 
     private async void Run(object state)
     {
-        while(Cpu.IsHalted == false && Cpu.IsErrored == false)
+        do
         {
             Step();
             StateHasChanged();
             await Task.Delay(1);
-        }
+        } while (Cpu.IsHalted == false && Cpu.IsErrored == false);
     }
 }
