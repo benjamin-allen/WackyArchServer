@@ -13,7 +13,7 @@ builder.Services.AddScoped<AlphaChallengeService>();
 #if DEBUG
 builder.Services.AddDbContextFactory<WAContext>(options =>
 {
-    options.UseSqlite($"DataSource=wackyarch_dev.sqlite");
+    options.UseSqlServer($"Server=localhost;Database=wackyarchserver;Trusted_Connection=True;");
 });
 #endif
 

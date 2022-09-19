@@ -46,7 +46,7 @@
         }
         ChallengeId = challengeId;
 
-        alphaChallenge = await alphaChallengeService.GetAlphaChallengeAsync(ChallengeId);
+        alphaChallenge = alphaChallengeService.GetAlphaChallenge(ChallengeId);
 
         InputPorts = alphaChallengeService.GetInputPorts(alphaChallenge.InputTextJson);
         OutputPorts = alphaChallengeService.GetOutputPorts(alphaChallenge.OutputTextJson);
@@ -90,13 +90,13 @@
         {
             codeBox.SetInfoMessage("");
             cyclables.ForEach(c => c.Cycle());
-            if (Cpu.IsHalted)
-            {
-                codeBox.SetInfoMessage("Program Complete");
-            }
-            else if (OutputPorts.All(o => o.ExpectedData.Count == 0))
+            if (OutputPorts.All(o => o.ExpectedData.Count == 0))
             {
                 codeBox.SetInfoMessage("Tests passed!");
+            }
+            else if (Cpu.IsHalted)
+            {
+                codeBox.SetInfoMessage("Program Complete");
             }
             else
             {

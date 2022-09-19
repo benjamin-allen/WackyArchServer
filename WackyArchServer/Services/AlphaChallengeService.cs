@@ -17,16 +17,14 @@ namespace WackyArchServer.Services
             this.contextFactory = contextFactory;
         }
 
-        public async Task<AlphaChallenge> GetAlphaChallengeAsync(Guid id)
+        public AlphaChallenge GetAlphaChallenge(Guid id)
         {
-            using (var context = await contextFactory.CreateDbContextAsync())
+            using (var context = contextFactory.CreateDbContext())
             {
                 // FOR SOME REASON context.AlphaChallenges.Where(c => c.Id == id).ToList() returns nothing???
                 // even though context.AlphaChallenges.ToList().Where(c => c.Id == id).ToList() returns data???
                 // Probably a fuckin Sqlite thing.
-                var data = context.AlphaChallenges.ToList();
-                var res = data.Where(d => d.Id == id).Single();
-                return res;
+                return context.AlphaChallenges.Where(c => c.Id.ToString() == id.ToString()).Single();
             }
         }
 
@@ -48,7 +46,7 @@ namespace WackyArchServer.Services
             {
                 var runLog = new RunLog { ChallengeId = challengeId, Code = programText, SubmitterAccount = account, SubmittedTime = DateTime.Now };
 
-                var challenge = await GetAlphaChallengeAsync(challengeId);
+                var challenge = GetAlphaChallenge(challengeId);
                 if (challenge == null)
                 {
                     runLog.CompletedTime = DateTime.Now;
@@ -58,7 +56,7 @@ namespace WackyArchServer.Services
                     return "Challenge not found.";
                 }
 
-                var tests = context.AlphaChallengeTests.Where(t => t.AlphaChallenge.Id == challengeId).ToList();
+                var tests = context.AlphaChallengeTests.Where(t => t.AlphaChallenge.Id.ToString() == challengeId.ToString()).ToList();
 
                 foreach (var test in tests)
                 {

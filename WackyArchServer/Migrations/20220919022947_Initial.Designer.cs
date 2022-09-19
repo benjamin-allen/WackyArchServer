@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WackyArchServer.Model;
@@ -11,27 +12,31 @@ using WackyArchServer.Model;
 namespace WackyArchServer.Migrations
 {
     [DbContext(typeof(WAContext))]
-    [Migration("20220919000831_alpha")]
-    partial class alpha
+    [Migration("20220919022947_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "6.0.8");
+            modelBuilder
+                .HasAnnotation("ProductVersion", "6.0.9")
+                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
             modelBuilder.Entity("WackyArchServer.Model.Account", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Passwordhash")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Username")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -40,87 +45,87 @@ namespace WackyArchServer.Migrations
 
             modelBuilder.Entity("WackyArchServer.Model.AlphaChallenge", b =>
                 {
-                    b.Property<Guid>("ID")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Flag")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("InputTextJson")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("OutputTextJson")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("PredecessorID")
-                        .HasColumnType("TEXT");
+                    b.Property<Guid?>("PredecessorId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("ID");
+                    b.HasKey("Id");
 
-                    b.HasIndex("PredecessorID");
+                    b.HasIndex("PredecessorId");
 
                     b.ToTable("AlphaChallenges");
                 });
 
             modelBuilder.Entity("WackyArchServer.Model.AlphaChallengeTest", b =>
                 {
-                    b.Property<Guid>("ID")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("AlphaChallengeID")
-                        .HasColumnType("TEXT");
+                    b.Property<Guid>("AlphaChallengeId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("InputTextJson")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("OutputTextJson")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("ID");
+                    b.HasKey("Id");
 
-                    b.HasIndex("AlphaChallengeID");
+                    b.HasIndex("AlphaChallengeId");
 
                     b.ToTable("AlphaChallengeTests");
                 });
 
             modelBuilder.Entity("WackyArchServer.Model.RunLog", b =>
                 {
-                    b.Property<Guid>("ID")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("ChallengeID")
-                        .HasColumnType("TEXT");
+                    b.Property<Guid>("ChallengeId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Code")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CompletedTime")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Result")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("SubmittedTime")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("datetime2");
 
                     b.Property<Guid>("SubmitterAccountId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("ID");
+                    b.HasKey("Id");
 
                     b.HasIndex("SubmitterAccountId");
 
@@ -131,9 +136,7 @@ namespace WackyArchServer.Migrations
                 {
                     b.HasOne("WackyArchServer.Model.AlphaChallenge", "Predecessor")
                         .WithMany()
-                        .HasForeignKey("PredecessorID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("PredecessorId");
 
                     b.Navigation("Predecessor");
                 });
@@ -142,7 +145,7 @@ namespace WackyArchServer.Migrations
                 {
                     b.HasOne("WackyArchServer.Model.AlphaChallenge", "AlphaChallenge")
                         .WithMany()
-                        .HasForeignKey("AlphaChallengeID")
+                        .HasForeignKey("AlphaChallengeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

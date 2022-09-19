@@ -5,7 +5,6 @@ namespace WackyArchServer.Model
 {
     public class RunLog
     {
-        [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
         public Guid ChallengeId { get; set; }

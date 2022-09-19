@@ -8,7 +8,6 @@ namespace WackyArchServer.Model
     /// </summary>
     public class AlphaChallenge
     {
-        [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
         public string Flag { get; set; }

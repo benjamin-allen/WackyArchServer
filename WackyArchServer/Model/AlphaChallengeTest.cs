@@ -5,7 +5,6 @@ namespace WackyArchServer.Model
 {
     public class AlphaChallengeTest
     {
-        [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
         public AlphaChallenge AlphaChallenge { get; set; }
