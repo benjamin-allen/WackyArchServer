@@ -1,33 +1,63 @@
-﻿@page "/alpha"
+﻿@page "/alpha/{ChallengeIdString}"
+@using WackyArchServer.Model
+
 <h3>AlphaArchitecture</h3>
+
+<div id="description">@Description</div>
 
 <CodeBox Cpu="Cpu" @ref="codeBox"></CodeBox>
 
-<CPUInfo Cpu="Cpu" LoadButtonPressed="LoadProgram" ResetButtonPressed="Reset" StepButtonPressed="Step" RunButtonPressed="Run"></CPUInfo>
-
-<FilledPort Port="Top"></FilledPort>
-<FilledPort Port="Bottom"></FilledPort>
-<ExpectationPort Port="Output"></ExpectationPort>
+<CPUInfo Cpu="Cpu" LoadButtonPressed="LoadProgram" ResetButtonPressed="Reset" StepButtonPressed="Step" RunButtonPressed="Run" SubmitButtonPressed="Submit"></CPUInfo>
+@foreach (var port in InputPorts)
+{
+    <FilledPort Port="port"></FilledPort>
+}
+@foreach (var port in OutputPorts)
+{
+    <ExpectationPort Port="port"></ExpectationPort>
+}
 
 @code {
+    [Parameter]
+    public string ChallengeIdString { get; set; }
+
+    public Guid ChallengeId { get; set; }
+
     public InterpreterCPU Cpu { get; set; }
-    public WackyArch.Components.FilledPort Top { get; set; }
-    public WackyArch.Components.FilledPort Bottom { get; set; }
-    public WackyArch.Components.ExpectationPort Output { get; set; }
+    public List<WackyArch.Components.FilledPort> InputPorts { get; set; }
+    public List<WackyArch.Components.ExpectationPort> OutputPorts { get; set; }
     private List<ICyclable> cyclables;
 
     private WackyArchServer.UIComponents.CodeBox codeBox;
+    public string Description;
 
-    protected override void OnInitialized()
+    [Inject]
+    private AlphaChallengeService alphaChallengeService { get; set; }
+    private AlphaChallenge alphaChallenge { get; set; }
+
+
+    protected async override Task OnInitializedAsync()
     {
-        base.OnInitialized();
-        Top = new WackyArch.Components.FilledPort(new int[] { 1, 2, 3, 4, 5, 6 }.Select(x => new Word() { Value = x }).ToList(), new Pipe(), "TOP");
-        Bottom = new WackyArch.Components.FilledPort(new int[] { 9, 8, 7, 6, 5, 10 }.Select(x => new Word() { Value = x }).ToList(), new Pipe(), "BOTTOM");
-        Output = new WackyArch.Components.ExpectationPort(new int[] { 0, 0, 0, 0, 0, 1 }.Select(x => new Word() { Value = x }).ToList(), "OUTPUT");
+        await base.OnInitializedAsync();
+        Guid challengeId;
+        if (!Guid.TryParse(ChallengeIdString, out challengeId))
+        {
+            // Do something. Empty Arch?
+        }
+        ChallengeId = challengeId;
 
-        Cpu = new InterpreterCPU(new Port[] { Top, Bottom, Output });
+        alphaChallenge = await alphaChallengeService.GetAlphaChallengeAsync(ChallengeId);
 
-        cyclables = new List<ICyclable> { Cpu, Top, Bottom, Output };
+        InputPorts = alphaChallengeService.GetInputPorts(alphaChallenge.InputTextJson);
+        OutputPorts = alphaChallengeService.GetOutputPorts(alphaChallenge.OutputTextJson);
+        var ports = new List<Port>(InputPorts);
+        ports.AddRange(OutputPorts);
+        Cpu = new InterpreterCPU(ports.ToArray());
+        cyclables = new List<ICyclable>(InputPorts);
+        cyclables.AddRange(OutputPorts);
+        cyclables.Add(Cpu);
+
+        Description = alphaChallenge.Description;
     }
 
     private void LoadProgram()
@@ -64,7 +94,7 @@
             {
                 codeBox.SetInfoMessage("Program Complete");
             }
-            else if (Output.ExpectedData.Count == 0)
+            else if (OutputPorts.All(o => o.ExpectedData.Count == 0))
             {
                 codeBox.SetInfoMessage("Tests passed!");
             }
@@ -88,5 +118,11 @@
             StateHasChanged();
             await Task.Delay(1);
         } while (Cpu.IsHalted == false && Cpu.IsErrored == false);
+    }
+
+    private async Task Submit()
+    {
+        var result = await alphaChallengeService.RunAlphaChallengeTests(ChallengeId, codeBox.CodeText, new Account { Username = "DEBUG", Id = Guid.NewGuid(), Passwordhash = ""});
+        Description = result;
     }
 }

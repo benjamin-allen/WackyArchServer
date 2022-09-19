@@ -1,8 +1,13 @@
-﻿namespace WackyArchServer.Model
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace WackyArchServer.Model
 {
     public class AlphaChallengeTest
     {
-        public Guid ID { get; set; } = Guid.NewGuid();
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public Guid Id { get; set; }
         public AlphaChallenge AlphaChallenge { get; set; }
 
         // These will be JSON Strings, to be decoded.

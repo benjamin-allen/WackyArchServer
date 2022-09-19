@@ -21,7 +21,12 @@ namespace WackyArchServer.Services
         {
             using (var context = await contextFactory.CreateDbContextAsync())
             {
-                return await context.AlphaChallenges.Where(c => c.ID == id).SingleOrDefaultAsync();
+                // FOR SOME REASON context.AlphaChallenges.Where(c => c.Id == id).ToList() returns nothing???
+                // even though context.AlphaChallenges.ToList().Where(c => c.Id == id).ToList() returns data???
+                // Probably a fuckin Sqlite thing.
+                var data = context.AlphaChallenges.ToList();
+                var res = data.Where(d => d.Id == id).Single();
+                return res;
             }
         }
 
@@ -41,7 +46,7 @@ namespace WackyArchServer.Services
         {
             using (var context = await contextFactory.CreateDbContextAsync())
             {
-                var runLog = new RunLog { ChallengeID = challengeId, Code = programText, SubmitterAccount = account, SubmittedTime = DateTime.Now };
+                var runLog = new RunLog { ChallengeId = challengeId, Code = programText, SubmitterAccount = account, SubmittedTime = DateTime.Now };
 
                 var challenge = await GetAlphaChallengeAsync(challengeId);
                 if (challenge == null)
@@ -53,7 +58,7 @@ namespace WackyArchServer.Services
                     return "Challenge not found.";
                 }
 
-                var tests = context.AlphaChallengeTests.Where(t => t.AlphaChallenge.ID == challengeId).ToList();
+                var tests = context.AlphaChallengeTests.Where(t => t.AlphaChallenge.Id == challengeId).ToList();
 
                 foreach (var test in tests)
                 {
@@ -78,7 +83,7 @@ namespace WackyArchServer.Services
                         }
                         catch (ComponentException cex)
                         {
-                            runLog.Result = $"Test failure: {cex.Message} | Test ID: {test.ID}";
+                            runLog.Result = $"Test failure: {cex.Message} | Test ID: {test.Id}";
                             runLog.CompletedTime = DateTime.Now;
                             context.RunLogs.Add(runLog);
                             await context.SaveChangesAsync();
@@ -95,11 +100,11 @@ namespace WackyArchServer.Services
                     {
                         if (outputPort.ExpectedData.Count != 0)
                         {
-                            runLog.Result = $"Test failure: Not all expected output was written to {outputPort.Name} or the program failed to finish in {AllowedCycles} cycles. Test ID {test.ID}.";
+                            runLog.Result = $"Test failure: Not all expected output was written to {outputPort.Name} or the program failed to finish in {AllowedCycles} cycles. Test ID {test.Id}.";
                             runLog.CompletedTime = DateTime.Now;
                             context.RunLogs.Add(runLog);
                             await context.SaveChangesAsync();
-                            return $"Test failure: Not all expected output was written to {outputPort.Name} or the program failed to finish in {AllowedCycles} cycles. Test ID {test.ID}.";
+                            return $"Test failure: Not all expected output was written to {outputPort.Name} or the program failed to finish in {AllowedCycles} cycles. Test ID {test.Id}.";
                         }
                     }
                 }
@@ -107,8 +112,15 @@ namespace WackyArchServer.Services
                 runLog.Result = "Success";
                 runLog.CompletedTime = DateTime.Now;
                 context.RunLogs.Add(runLog);
-                await context.SaveChangesAsync();
-                return challenge.Flag;
+                try
+                {
+                    await context.SaveChangesAsync();
+                }
+                catch (Exception ex)
+                {
+                    return "";
+                }
+                return challenge.Flag; // Select the flag out of the database, not the fake one.
             }
         }
     }

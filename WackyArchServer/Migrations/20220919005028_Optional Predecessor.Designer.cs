@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WackyArchServer.Model;
 
@@ -10,9 +11,10 @@ using WackyArchServer.Model;
 namespace WackyArchServer.Migrations
 {
     [DbContext(typeof(WAContext))]
-    partial class WAContextModelSnapshot : ModelSnapshot
+    [Migration("20220919005028_Optional Predecessor")]
+    partial class OptionalPredecessor
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "6.0.8");
@@ -38,7 +40,7 @@ namespace WackyArchServer.Migrations
 
             modelBuilder.Entity("WackyArchServer.Model.AlphaChallenge", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<Guid>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
@@ -58,23 +60,23 @@ namespace WackyArchServer.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid?>("PredecessorId")
+                    b.Property<Guid?>("PredecessorID")
                         .HasColumnType("TEXT");
 
-                    b.HasKey("Id");
+                    b.HasKey("ID");
 
-                    b.HasIndex("PredecessorId");
+                    b.HasIndex("PredecessorID");
 
                     b.ToTable("AlphaChallenges");
                 });
 
             modelBuilder.Entity("WackyArchServer.Model.AlphaChallengeTest", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<Guid>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid>("AlphaChallengeId")
+                    b.Property<Guid>("AlphaChallengeID")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("InputTextJson")
@@ -85,20 +87,20 @@ namespace WackyArchServer.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.HasKey("Id");
+                    b.HasKey("ID");
 
-                    b.HasIndex("AlphaChallengeId");
+                    b.HasIndex("AlphaChallengeID");
 
                     b.ToTable("AlphaChallengeTests");
                 });
 
             modelBuilder.Entity("WackyArchServer.Model.RunLog", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<Guid>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid>("ChallengeId")
+                    b.Property<Guid>("ChallengeID")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Code")
@@ -118,7 +120,7 @@ namespace WackyArchServer.Migrations
                     b.Property<Guid>("SubmitterAccountId")
                         .HasColumnType("TEXT");
 
-                    b.HasKey("Id");
+                    b.HasKey("ID");
 
                     b.HasIndex("SubmitterAccountId");
 
@@ -129,7 +131,7 @@ namespace WackyArchServer.Migrations
                 {
                     b.HasOne("WackyArchServer.Model.AlphaChallenge", "Predecessor")
                         .WithMany()
-                        .HasForeignKey("PredecessorId");
+                        .HasForeignKey("PredecessorID");
 
                     b.Navigation("Predecessor");
                 });
@@ -138,7 +140,7 @@ namespace WackyArchServer.Migrations
                 {
                     b.HasOne("WackyArchServer.Model.AlphaChallenge", "AlphaChallenge")
                         .WithMany()
-                        .HasForeignKey("AlphaChallengeId")
+                        .HasForeignKey("AlphaChallengeID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

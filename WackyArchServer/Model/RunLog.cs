@@ -1,9 +1,14 @@
-﻿namespace WackyArchServer.Model
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace WackyArchServer.Model
 {
     public class RunLog
     {
-        public Guid ID { get; set; } = Guid.NewGuid();
-        public Guid ChallengeID { get; set; }
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public Guid Id { get; set; }
+        public Guid ChallengeId { get; set; }
         public DateTime SubmittedTime { get; set; }
         public DateTime CompletedTime { get; set; }
         public Account SubmitterAccount { get; set; }
