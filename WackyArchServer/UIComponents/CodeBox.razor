@@ -1,9 +1,6 @@
-﻿<div class="codebox-container">
-    <textarea id="codeBox" rows="@rows" cols="@cols"
-        @oninput="setCodeText"
-        @onchange="testAssemble"
-        @onkeydown="checkKey"></textarea>
-</div>
+﻿@inject IJSRuntime JS
+
+<div id="ace-editor"></div>
 <div class="codebox-info" >
     <p>@infoMessage</p>
 </div>
@@ -30,40 +27,22 @@
         cols = Math.Min(cols, minCols);
     }
 
-    /// <summary>
-    /// Attempt to assemble the code in the inputbox. If there's an error, 
-    /// mark the line number and error string.
-    /// </summary>
-    /// <param name="args"></param>
-    public void testAssemble(ChangeEventArgs args)
+    #region CodeMirrorInterop
+    private IJSObjectReference module { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        try
+        if (firstRender)
         {
-            Assembler.Assemble(Cpu, (string)args.Value, out _);
-            infoMessage = "";
-        }
-        catch (AssemblerException e)
-        {
-            infoMessage = $"[Line {e.LineNumber}] {e.ShortMessage}";
+            module = await JS.InvokeAsync<IJSObjectReference>("import", "./UIComponents/CodeBox.razor.js");
+            await module.InvokeAsync<string>("setup");
         }
     }
+    #endregion
 
-    private void setCodeText(ChangeEventArgs args)
+    public void UpdateLinePointer(int line, bool isError)
     {
-        CodeText = (string)args.Value;
-    }
-
-    private void checkKey(KeyboardEventArgs args)
-    {
-        if (args.Key == "Enter" || args.Key == "NumpadEnter")
-        {
-            testAssemble(new ChangeEventArgs { Value = CodeText });
-        }
-    }
-
-    public void UpdateLinePointer(int line)
-    {
-        Console.WriteLine($"Highlight line {line}");
+        Console.WriteLine($"Highlight line {line}, isError: {isError}");
     }
 
     public void SetInfoMessage(string infoMessage)

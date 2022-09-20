@@ -1,30 +1,6 @@
-﻿[] UI
-	[] Code Box
-		[x] CPU parameter
-		[x] needs a way to get the program text out of the box
-		[x] A box to put information about the status of the program (failed to assemble, running, etc)
-		[x] needs a way to inform the component that the PC has changed and the running line indicator should be redrawn
-		[] general styling
-		[] Line numbers
-		[] fixed width / height
-		[] Monospace font
-
-	[] CPU Info Box
-		[x] Display CPU status
-		[x] Provide Controls
-
-	[] Pipes
-	
-	[] Challenge Info
-
-[] Architectures
-	[] Tutorial / Alpha : "write code to do a task"
-	
-	[] Beta : "write an input to break the machine"
-
-	[] ?Gamma? : "write code to create inputs to the machine that break the machine?"
-
-
-
-[] WackyArch
-	[] "Unlock" Instruction
+﻿[] A page to List the available challenges for an account
+[] Styling on AlphaArchitecture
+[] Beta Architecture Components
+	[] Memory View
+	[] Disassembly View
+	[] Input Box
