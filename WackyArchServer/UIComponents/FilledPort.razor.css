@@ -1,0 +1,54 @@
+﻿.filled-port-container {
+    background-color: var(--bg-green);
+    min-width: 80px;
+    max-width: 120px;
+    display: flex;
+    flex-flow: column;
+    /*border-left: 3px solid var(--fg-darkgray);
+    border-right: 3px solid var(--fg-darkgray);
+    border-bottom: 1px solid var(--fg-darkgray);
+    border-top: 3px solid var(--fg-darkgray);*/
+}
+
+.filled-port-info {
+    border: 1px solid var(--fg-darkgray);
+    background-color: var(--bg-green-dark);
+    color: var(--fg-white);
+    padding-top: 0.25em;
+    padding-bottom: 0.25em;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+}
+
+.filled-port-content {
+    border-left: 3px solid var(--fg-darkgray);
+    border-right: 3px solid var(--fg-darkgray);
+    border-bottom: 3px solid var(--fg-darkgray);
+    height: 100%;
+    overflow-y: hidden;
+}
+
+.filled-port-content pre {
+    font-family: "IBM VGA";
+    font-size: 16px;
+    margin-bottom: 0.25em;
+    margin-top: 0.25em;
+    margin-left: 0.25em;
+    margin-right: 0.25em;
+    padding-left: 0.5em;
+    border-bottom: 1px solid var(--fg-darkgray);
+}
+
+.filled-port-content pre.current-data {
+    background-color: var(--hl-blue);
+    text-align: right;
+    padding-top: 0.2em;
+    padding-bottom: 0.2em;
+}
+
+.filled-port-content pre.current-data span {
+    margin-left: 0.5em;
+    margin-right: 0.5em;
+    float: right;
+    top: -1px;
+}

@@ -1,11 +1,18 @@
-﻿<div class="PortInfo">
-    @Port.Name [@Port.ExpectedData.Count]
-</div>
-<div class="PortContent">
-    @foreach(Word data in Port.ExpectedData)
-    {
-        <pre>@data.Value</pre>
-    }
+﻿<div class="expectation-port-container">
+
+    <div class="expectation-port-info">
+        @Port.Name [@Port.ExpectedData.Count]
+    </div>
+    <div class="expectation-port-content">
+        @if (Port.ExpectedData.Count > 0)
+        {
+            <pre class="expectation-current-data"><span class="oi oi-arrow-right"></span> @Port.ExpectedData[0].Value </pre>
+        }
+        @for (int i = 1; i < Port.ExpectedData.Count; i++)
+        {
+            <pre>@Port.ExpectedData[i].Value</pre>
+        }
+    </div>
 </div>
 
 @code {

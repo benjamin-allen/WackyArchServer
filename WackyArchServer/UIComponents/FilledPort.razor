@@ -1,12 +1,17 @@
-﻿<div class="PortInfo">
-    @Port.Name [@(Port.BacklogData.Count + (Port.CurrentData == null ? 0 : 1))]
-</div>
-<div class="PortContent">
-    <pre>@Port.CurrentData?.Value</pre>
-    @foreach(Word data in Port.BacklogData)
-    {
-        <pre>@data.Value</pre>
-    }
+﻿<div class="filled-port-container">
+    <div class="filled-port-info">
+        @Port.Name [@(Port.BacklogData.Count + (Port.CurrentData == null ? 0 : 1))]
+    </div>
+    <div class="filled-port-content">
+        @if (Port.CurrentData != null)
+        {
+            <pre class="current-data">@Port.CurrentData?.Value <span class="oi oi-arrow-right"></span></pre>
+        }
+        @foreach(Word data in Port.BacklogData)
+        {
+            <pre>@data.Value</pre>
+        }
+    </div>
 </div>
 
 @code {
