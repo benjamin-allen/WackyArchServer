@@ -1,21 +1,38 @@
-﻿<div class="cpuinfo-mainbox">
-    <table>
-        <tr><th></th><th>Dec</th><th>Hex</th></tr>
-        @foreach(var register in Cpu.Registers)
-        {
-            <tr><td>@register.Name</td><td>@register.Data.Value</td><td>@((register.Data.Value & 0xFFF).ToString("x"))</td></tr>
-        }
-    </table>
-    <div class="cpustatus">
-        CPU: @CpuStatus
+﻿<div id="cpuinfo-container">
+    <div id="cpuinfo-mainbox">
+        <table>
+            <tr><th></th><th>Decimal</th><th>Hex</th></tr>
+            @foreach(var register in Cpu.Registers)
+            {
+                <tr><td>@register.Name</td><td>@register.Data.Value</td><td>@((register.Data.Value & 0xFFF).ToString("x"))</td></tr>
+            }
+        </table>
+        <div id="cpuinfo-status">
+            CPU: @CpuStatus
+        </div>
     </div>
-</div>
-<div class="controls">
-    <button @onclick="args => RunEvent(LoadButtonPressed)" disabled=@loadButtonDisabled>Load Program</button><br/>
-    <button @onclick="args => RunEvent(StepButtonPressed)" disabled=@stepButtonDisabled>Step</button><br/>
-    <button @onclick="args => RunEvent(RunButtonPressed)" disabled=@runButtonDisabled>Run</button><br/>
-    <button @onclick="args => RunEvent(ResetButtonPressed)" disabled=@resetButtonDisabled>Reset</button><br/>
-    <button @onclick="SubmitButtonPressed">Submit Solution</button><br/>
+    <div id="cpuinfo-controls">
+        <button id="top-button" @onclick="args => RunEvent(LoadButtonPressed)" disabled=@loadButtonDisabled>
+            <span class="oi oi-data-transfer-download"></span>
+            Load Program
+        </button>
+        <button @onclick="args => RunEvent(StepButtonPressed)" disabled=@stepButtonDisabled>
+            <span class="oi oi-arrow-thick-right"></span>
+            Step
+        </button>
+        <button @onclick="args => RunEvent(RunButtonPressed)" disabled=@runButtonDisabled>
+            <span class="oi oi-media-play"></span>
+            Run
+        </button>
+        <button @onclick="args => RunEvent(ResetButtonPressed)" disabled=@resetButtonDisabled>
+            <span class="oi oi-reload"></span>
+            Reset
+        </button>
+        <button id="bottom-button" @onclick="SubmitButtonPressed" disabled=@submitButtonDisabled>
+            <span class="oi oi-flag"></span>
+            Submit
+        </button>
+    </div>
 </div>
 
 @code {
@@ -39,6 +56,7 @@
     private bool stepButtonDisabled = false;
     private bool runButtonDisabled = false;
     private bool resetButtonDisabled = false;
+    private bool submitButtonDisabled = true;
 
     private async void RunEvent(EventCallback callback)
     {
@@ -66,7 +84,7 @@
         else if (Cpu.IsHalted && !Cpu.IsErrored)
         {
             CpuStatus = "READY";
-            loadButtonDisabled = false;
+            loadButtonDisabled = true;
             stepButtonDisabled = false;
             runButtonDisabled = false;
             resetButtonDisabled = false;
@@ -87,5 +105,10 @@
             runButtonDisabled = false;
             resetButtonDisabled = false;
         }
+    }
+
+    public void DisableSubmitButton(bool disabled)
+    {
+        submitButtonDisabled = disabled;
     }
 }

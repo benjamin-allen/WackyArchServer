@@ -7,7 +7,7 @@
 
 <CodeBox Cpu="Cpu" @ref="codeBox"></CodeBox>
 
-<CPUInfo Cpu="Cpu" LoadButtonPressed="LoadProgram" ResetButtonPressed="Reset" StepButtonPressed="Step" RunButtonPressed="Run" SubmitButtonPressed="Submit"></CPUInfo>
+<CPUInfo Cpu="Cpu" LoadButtonPressed="LoadProgram" ResetButtonPressed="Reset" StepButtonPressed="Step" RunButtonPressed="Run" SubmitButtonPressed="Submit" @ref="cpuInfo"></CPUInfo>
 @foreach (var port in InputPorts)
 {
     <FilledPort Port="port"></FilledPort>
@@ -29,6 +29,7 @@
     private List<ICyclable> cyclables;
 
     private WackyArchServer.UIComponents.CodeBox codeBox;
+    private WackyArchServer.UIComponents.CPUInfo cpuInfo;
     public string Description;
 
     [Inject]
@@ -63,6 +64,7 @@
     {
         var codeText = await codeBox.GetText();
         if (string.IsNullOrWhiteSpace(codeText)) return;
+        cpuInfo.DisableSubmitButton(true);
 
         try
         {
@@ -97,6 +99,7 @@
             if (OutputPorts.All(o => o.ExpectedData.Count == 0))
             {
                 codeBox.SetInfoMessage("Tests passed!");
+                cpuInfo.DisableSubmitButton(false);
             }
             else if (Cpu.IsHalted)
             {
@@ -132,9 +135,13 @@
 
     private async Task Submit()
     {
+        codeBox.SetInfoMessage("Submitted...");
+        StateHasChanged();
+
         var codeText = await codeBox.GetText();
+        await Task.Delay(1000);
         var result = await alphaChallengeService.RunAlphaChallengeTests(ChallengeId, codeText, new Account { Username = "DEBUG", Id = Guid.NewGuid(), Passwordhash = ""});
-        Description = result;
+        codeBox.SetInfoMessage(result);
         StateHasChanged();
     }
 }

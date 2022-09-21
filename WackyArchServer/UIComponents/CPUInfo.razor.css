@@ -1,0 +1,90 @@
+﻿#cpuinfo-container {
+    width: 420px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+#cpuinfo-mainbox {
+    width: 200px;
+    height: auto;
+    border: 2px solid var(--fg-darkgray);
+    background-color: var(--bg-green-light);
+    color: var(--fg-darkgray);
+}
+
+#cpuinfo-mainbox table {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#cpuinfo-mainbox table th {
+    text-align: right;
+    font-weight: normal;
+}
+
+#cpuinfo-mainbox table tr {
+    border-bottom: 1px solid var(--bg-green-dark);
+}
+
+#cpuinfo-mainbox table td {
+    text-align: right;
+    width: 60px;
+}
+
+#cpuinfo-status {
+    margin-top: 1em;
+    padding-left: 1em;
+    padding-right: 1em;
+    padding-top: 0.2em;
+}
+
+#cpuinfo-controls {
+    width: 200px;
+    height: 170px;
+    border: 2px solid var(--fg-darkgray);
+    background-color: var(--bg-green-light);
+    color: var(--fg-darkgray);
+}
+
+#cpuinfo-controls button {
+    width: 80%;
+    margin-top: 0.3em;
+    margin-bottom: 0.4em;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    background-color: var(--bg-green);
+    color: var(--fg-white);
+    outline: none;
+    border: none;
+    border-radius: 6px;
+    box-shadow: 0 4px #444;
+}
+
+#cpuinfo-controls button span {
+    width: 14px;
+    height: 14px;
+    margin-right: 8px;
+}
+
+#cpuinfo-controls button:hover {
+    background-color: var(--bg-green-dark);
+}
+
+#cpuinfo-controls button:active {
+    background-color: var(--bg-green-dark);
+    box-shadow: 0 1px #222;
+    transform: translateY(3px);
+}
+
+#cpuinfo-controls button:disabled {
+    background-color: var(--fg-gray);
+    color: var(--fg-darkgray);
+    transform: translateY(2px);
+    box-shadow: 0 2px; #222;
+}
+
+#cpuinfo-controls #bottom-button {
+    margin-top: 1.5em;
+}
