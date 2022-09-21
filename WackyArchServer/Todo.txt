@@ -1,5 +1,6 @@
 ﻿[] A page to List the available challenges for an account
 [] Styling on AlphaArchitecture
+	[] Light green in codebox is too hard to read. Could possibly be black text instead
 [] Beta Architecture Components
 	[] Memory View
 	[] Disassembly View

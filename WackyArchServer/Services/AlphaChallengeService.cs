@@ -109,15 +109,8 @@ namespace WackyArchServer.Services
                 runLog.Result = "Success";
                 runLog.CompletedTime = DateTime.Now;
                 context.RunLogs.Add(runLog);
-                try
-                {
-                    await context.SaveChangesAsync();
-                }
-                catch (Exception ex)
-                {
-                    return "";
-                }
-                return challenge.Flag; // Select the flag out of the database, not the fake one.
+                await context.SaveChangesAsync();
+                return challenge.Flag;
             }
         }
     }

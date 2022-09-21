@@ -70,11 +70,12 @@
             codeBox.SetInfoMessage("");
             Cpu.Load(codeText);
             codeBox.SetInfoMessage("Program Loaded");
+            await codeBox.SetLinePointer(Cpu.PcLineMap[0] + 1, false);
         }
         catch (AssemblerException ae)
         {
-            codeBox.SetInfoMessage(ae.ShortMessage);
-            await codeBox.SetLinePointer(ae.LineNumber, true);
+            codeBox.SetInfoMessage(ae.Message);
+            await codeBox.SetLinePointer(ae.LineNumber + 1, true);
         }
 
         StateHasChanged();
@@ -84,7 +85,6 @@
     {
         cyclables.ForEach(c => c.Reset());
         codeBox.SetInfoMessage("System Reset");
-        await codeBox.SetLinePointer(1, false);
         StateHasChanged();
     }
 
@@ -124,7 +124,7 @@
     {
         do
         {
-            Step();
+            await Step();
             StateHasChanged();
             await Task.Delay(1);
         } while (Cpu.IsHalted == false && Cpu.IsErrored == false);

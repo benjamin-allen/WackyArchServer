@@ -1,8 +1,10 @@
 ﻿@inject IJSRuntime JS
 
-<div id="ace-editor"></div>
-<div class="codebox-info" >
-    <p>@infoMessage</p>
+<div id="codebox-container">
+    <div id="codebox-info" >
+        <p>@infoMessage</p>
+    </div>
+    <div id="ace-editor"></div>
 </div>
 
 
@@ -10,7 +12,7 @@
     [Parameter, EditorRequired]
     public CPU Cpu { get; set; }
 
-    private string infoMessage { get; set; }
+    private string infoMessage { get; set; } = "";
 
 
     #region Ace Interop

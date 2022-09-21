@@ -14,7 +14,7 @@ export function setLinePointer(line, isError) {
         let cell = gutterCells[i];
         cell.style.backgroundColor = ""; // clear all lines by default
         if (cell.innerText == line) {
-            cell.style.backgroundColor = (isError) ? "red" : "yellow";
+            cell.style.backgroundColor = (isError) ? "var(--hl-red)" : "var(--hl-blue)";
         }
     }
 }
