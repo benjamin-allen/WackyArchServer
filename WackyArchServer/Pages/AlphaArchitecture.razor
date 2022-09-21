@@ -23,9 +23,9 @@
 
     public Guid ChallengeId { get; set; }
 
-    public InterpreterCPU Cpu { get; set; }
-    public List<WackyArch.Components.FilledPort> InputPorts { get; set; }
-    public List<WackyArch.Components.ExpectationPort> OutputPorts { get; set; }
+    private InterpreterCPU Cpu { get; set; }
+    private List<WackyArch.Components.FilledPort> InputPorts { get; set; }
+    private List<WackyArch.Components.ExpectationPort> OutputPorts { get; set; }
     private List<ICyclable> cyclables;
 
     private WackyArchServer.UIComponents.CodeBox codeBox;
@@ -42,7 +42,7 @@
         Guid challengeId;
         if (!Guid.TryParse(ChallengeIdString, out challengeId))
         {
-            // Do something. Empty Arch?
+            // Do something. Empty Arch so they have a sandbox?
         }
         ChallengeId = challengeId;
 
@@ -53,38 +53,42 @@
         var ports = new List<Port>(InputPorts);
         ports.AddRange(OutputPorts);
         Cpu = new InterpreterCPU(ports.ToArray());
-        cyclables = new List<ICyclable>(InputPorts);
-        cyclables.AddRange(OutputPorts);
-        cyclables.Add(Cpu);
+        cyclables = new List<ICyclable> { Cpu };
+        cyclables.AddRange(ports);
 
         Description = alphaChallenge.Description;
     }
 
-    private void LoadProgram()
+    private async Task LoadProgram()
     {
-        var codeText = codeBox.CodeText;
+        var codeText = await codeBox.GetText();
         if (string.IsNullOrWhiteSpace(codeText)) return;
 
         try
         {
             Reset();
             codeBox.SetInfoMessage("");
-            Cpu.Load(codeBox.CodeText);
+            Cpu.Load(codeText);
             codeBox.SetInfoMessage("Program Loaded");
         }
         catch (AssemblerException ae)
         {
             codeBox.SetInfoMessage(ae.ShortMessage);
+            await codeBox.SetLinePointer(ae.LineNumber, true);
         }
+
+        StateHasChanged();
     }
 
-    private void Reset()
+    private async void Reset()
     {
         cyclables.ForEach(c => c.Reset());
         codeBox.SetInfoMessage("System Reset");
+        await codeBox.SetLinePointer(1, false);
+        StateHasChanged();
     }
 
-    private void Step()
+    private async Task Step()
     {
         try
         {
@@ -108,9 +112,15 @@
             codeBox.SetInfoMessage(cex.ShortMessage);
             Cpu.IsErrored = true;
         }
+        finally
+        {
+            var isInLineMap = Cpu.PcLineMap.TryGetValue(Cpu.GetPCValue(), out int currentLine);
+            await codeBox.SetLinePointer(isInLineMap ? currentLine+1 : 0, Cpu.IsErrored);
+            StateHasChanged();
+        }
     }
 
-    private async void Run(object state)
+    private async Task Run(object state)
     {
         do
         {
@@ -122,7 +132,9 @@
 
     private async Task Submit()
     {
-        var result = await alphaChallengeService.RunAlphaChallengeTests(ChallengeId, codeBox.CodeText, new Account { Username = "DEBUG", Id = Guid.NewGuid(), Passwordhash = ""});
+        var codeText = await codeBox.GetText();
+        var result = await alphaChallengeService.RunAlphaChallengeTests(ChallengeId, codeText, new Account { Username = "DEBUG", Id = Guid.NewGuid(), Passwordhash = ""});
         Description = result;
+        StateHasChanged();
     }
 }

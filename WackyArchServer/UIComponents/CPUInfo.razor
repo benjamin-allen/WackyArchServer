@@ -16,7 +16,6 @@
     <button @onclick="args => RunEvent(RunButtonPressed)" disabled=@runButtonDisabled>Run</button><br/>
     <button @onclick="args => RunEvent(ResetButtonPressed)" disabled=@resetButtonDisabled>Reset</button><br/>
     <button @onclick="SubmitButtonPressed">Submit Solution</button><br/>
-    <button @onclick="BackButtonPressed">Exit Challenge</button><br/>
 </div>
 
 @code {
@@ -33,8 +32,6 @@
     public EventCallback ResetButtonPressed { get; set; }
     [Parameter]
     public EventCallback SubmitButtonPressed { get; set; }
-    [Parameter]
-    public EventCallback BackButtonPressed { get; set; }
 
     public string CpuStatus { get; set; }
 

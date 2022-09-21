@@ -67,9 +67,8 @@ namespace WackyArchServer.Services
 
                     var cpu = new InterpreterCPU(ports.ToArray());
 
-                    var cyclables = new List<ICyclable>(inputPorts);
-                    cyclables.AddRange(outputPorts);
-                    cyclables.Add(cpu);
+                    var cyclables = new List<ICyclable> { cpu };
+                    cyclables.AddRange(ports);
 
                     cpu.Load(programText);
 

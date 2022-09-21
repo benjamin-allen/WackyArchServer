@@ -7,27 +7,13 @@
 
 
 @code {
-    [Parameter]
-    public int rows { get; set; } = 30;
-    [Parameter]
-    public int cols { get; set; } = 18;
-    private int minRows { get; set; } = 4;
-    private int minCols { get; set; } = 18;
-
     [Parameter, EditorRequired]
     public CPU Cpu { get; set; }
 
-    public string CodeText { get; set; }
-
     private string infoMessage { get; set; }
 
-    protected override void OnInitialized()
-    {
-        rows = Math.Min(rows, minRows);
-        cols = Math.Min(cols, minCols);
-    }
 
-    #region CodeMirrorInterop
+    #region Ace Interop
     private IJSObjectReference module { get; set; }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -35,15 +21,25 @@
         if (firstRender)
         {
             module = await JS.InvokeAsync<IJSObjectReference>("import", "./UIComponents/CodeBox.razor.js");
-            await module.InvokeAsync<string>("setup");
+            await module.InvokeVoidAsync("setup");
         }
+    }
+
+    public async Task<string> GetText()
+    {
+        return await module.InvokeAsync<string>("getText");
+    }
+
+    /// <summary>
+    /// Highlights the input line, and highlights it red if isError is set.
+    /// line = 0 will clear all highlights.
+    /// </summary>
+    public async Task SetLinePointer(int line, bool isError)
+    {
+        await module.InvokeVoidAsync("setLinePointer", line, isError);
     }
     #endregion
 
-    public void UpdateLinePointer(int line, bool isError)
-    {
-        Console.WriteLine($"Highlight line {line}, isError: {isError}");
-    }
 
     public void SetInfoMessage(string infoMessage)
     {
