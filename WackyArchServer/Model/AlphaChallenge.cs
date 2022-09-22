@@ -12,6 +12,8 @@ namespace WackyArchServer.Model
         public Guid Id { get; set; }
         public string Flag { get; set; }
         public AlphaChallenge? Predecessor { get; set; }
+        public string Name { get; set; }
+        public string Category { get; set; }
         public string Description { get; set; }
 
         // These will be JSON Strings, to be decoded.
