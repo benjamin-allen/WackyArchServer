@@ -1,8 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 namespace WackyArchServer.Model
 {
-    public class WAContext : DbContext
+    public class WAContext : IdentityDbContext
     {
         public WAContext(DbContextOptions<WAContext> options) : base(options) { }
 

@@ -19,3 +19,6 @@
 	[] UNLOCK command
 	[] Other cryptographic primitives?
 	[] 
+
+[] AUTHENTICATION
+	
