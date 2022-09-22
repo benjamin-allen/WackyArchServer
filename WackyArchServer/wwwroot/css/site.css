@@ -22,8 +22,13 @@
     src: url('../fonts/Web437_IBM_VGA_8x16.woff') format('woff');
 }
 
+@font-face {
+    font-family: "Inconsolata";
+    src: url('../fonts/inconsolata.woff') format('woff');
+}
+
 html, body {
-    font-family: "IBM VGA", Arial, sans-serif !important;
+    font-family: monospace, sans-serif !important;
     font-size: 16px;
     line-height: 16px;
 }

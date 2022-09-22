@@ -1,0 +1,84 @@
+﻿#alpha-arch-container {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+    flex-flow: column;
+    row-gap: 1em;
+    background-color: var(--bg-green-dark);
+}
+
+#alpha-arch-emulator-container {
+    width: 100%;
+    display: flex;
+    flex-flow: row;
+    column-gap: 3em;
+}
+
+#alpha-input-ports-container {
+    width: 30%;
+    display: flex;
+    flex-flow: row-reverse;
+    column-gap: 1em;
+}
+
+#alpha-input-ports-container h3 {
+    width: 100%;
+}
+
+#alpha-center-container {
+    width: 40%;
+    display: flex;
+    flex-flow: column;
+    min-width: 420px;
+    max-width: 600px;
+    row-gap: 2em;
+}
+
+#alpha-center-container #alpha-center-codebox {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#alpha-center-container #alpha-center-cpuinfo {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#alpha-output-ports-container {
+    width: 30%;
+    display: flex;
+    flex-flow: row;
+    column-gap: 1em;
+}
+
+#alpha-output-ports-container h3 {
+    width: 100%;
+}
+
+#alpha-arch-container #alpha-description {
+    background-color: var(--bg-green-light);
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+    padding-left: 1em;
+    padding-right: 1em;
+    font-family: Arial, Helvetica, sans-serif;
+    min-height: 3em;
+    max-height: 7em;
+    overflow-y: auto;
+    white-space: pre-line;
+}
+
+#alpha-header-row {
+    display: flex;
+    flex-flow: row;
+    justify-content: space-between
+}
+
+#alpha-header-row h3 {
+    font-weight: 700;
+    width: 30%;
+    text-align: center;
+    color: var(--fg-darkygray);
+    border-bottom: 2px solid var(--fg-darkgray);
+}

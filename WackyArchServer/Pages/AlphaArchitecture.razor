@@ -1,21 +1,36 @@
 ﻿@page "/alpha/{ChallengeIdString}"
 @using WackyArchServer.Model
+<div id="alpha-arch-container">
+    <div id="alpha-description">@Description</div>
+    <div id="alpha-header-row">
+        <h3>Input Ports</h3>
+        <h3>Output Ports</h3>
+    </div>
+    <div id="alpha-arch-emulator-container">
+        <div id="alpha-input-ports-container">
+            @foreach (var port in InputPorts)
+            {
+                <FilledPort Port="port"></FilledPort>
+            }
+        </div>
 
-<h3>AlphaArchitecture</h3>
+        <div id="alpha-center-container">
+            <div id="alpha-center-codebox">
+                <CodeBox Cpu="Cpu" @ref="codeBox"></CodeBox>
+            </div>
+            <div id="alpha-center-cpuinfo">
+                <CPUInfo Cpu="Cpu" LoadButtonPressed="LoadProgram" ResetButtonPressed="Reset" StepButtonPressed="Step" RunButtonPressed="Run" SubmitButtonPressed="Submit" @ref="cpuInfo"></CPUInfo>
+            </div>
+        </div>
 
-<div id="description">@Description</div>
-
-<CodeBox Cpu="Cpu" @ref="codeBox"></CodeBox>
-
-<CPUInfo Cpu="Cpu" LoadButtonPressed="LoadProgram" ResetButtonPressed="Reset" StepButtonPressed="Step" RunButtonPressed="Run" SubmitButtonPressed="Submit" @ref="cpuInfo"></CPUInfo>
-@foreach (var port in InputPorts)
-{
-    <FilledPort Port="port"></FilledPort>
-}
-@foreach (var port in OutputPorts)
-{
-    <ExpectationPort Port="port"></ExpectationPort>
-}
+        <div id="alpha-output-ports-container">
+            @foreach (var port in OutputPorts)
+            {
+                <ExpectationPort Port="port"></ExpectationPort>
+            }
+        </div>
+    </div>
+</div>
 
 @code {
     [Parameter]
