@@ -21,14 +21,11 @@ namespace WackyArchServer.Services
             this.authProvider = authenticationStateProvider;
         }
 
-        public AlphaChallenge GetAlphaChallenge(Guid id)
+        public async Task<AlphaChallenge> GetAlphaChallengeAsync(Guid id)
         {
-            using (var context = contextFactory.CreateDbContext())
+            using (var context = await contextFactory.CreateDbContextAsync())
             {
-                // FOR SOME REASON context.AlphaChallenges.Where(c => c.Id == id).ToList() returns nothing???
-                // even though context.AlphaChallenges.ToList().Where(c => c.Id == id).ToList() returns data???
-                // Probably a fuckin Sqlite thing.
-                return context.AlphaChallenges.Where(c => c.Id.ToString() == id.ToString()).Single();
+                return await context.AlphaChallenges.Where(c => c.Id.ToString() == id.ToString()).SingleAsync();
             }
         }
 
@@ -53,7 +50,7 @@ namespace WackyArchServer.Services
 
                 var runLog = new RunLog { ChallengeId = challengeId, Code = programText, SubmitterAccountId = Guid.Parse(userId), SubmittedTime = DateTime.Now };
 
-                var challenge = GetAlphaChallenge(challengeId);
+                var challenge = await GetAlphaChallengeAsync(challengeId);
                 if (challenge == null)
                 {
                     runLog.CompletedTime = DateTime.Now;

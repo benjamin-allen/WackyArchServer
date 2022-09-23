@@ -40,10 +40,10 @@
 
     public Guid ChallengeId { get; set; }
 
-    private InterpreterCPU Cpu { get; set; }
-    private List<WackyArch.Components.FilledPort> InputPorts { get; set; }
-    private List<WackyArch.Components.ExpectationPort> OutputPorts { get; set; }
-    private List<ICyclable> cyclables;
+    private InterpreterCPU Cpu { get; set; } = new();
+    private List<WackyArch.Components.FilledPort> InputPorts { get; set; } = new();
+    private List<WackyArch.Components.ExpectationPort> OutputPorts { get; set; } = new();
+    private List<ICyclable> cyclables = new();
 
     private WackyArchServer.UIComponents.CodeBox codeBox;
     private WackyArchServer.UIComponents.CPUInfo cpuInfo;
@@ -65,7 +65,7 @@
         }
         ChallengeId = challengeId;
 
-        alphaChallenge = alphaChallengeService.GetAlphaChallenge(ChallengeId);
+        alphaChallenge = await alphaChallengeService.GetAlphaChallengeAsync(ChallengeId);
 
         InputPorts = alphaChallengeService.GetInputPorts(alphaChallenge.InputTextJson);
         OutputPorts = alphaChallengeService.GetOutputPorts(alphaChallenge.OutputTextJson);
