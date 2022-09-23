@@ -10,7 +10,7 @@ namespace WackyArchServer.Model
         public Guid ChallengeId { get; set; }
         public DateTime SubmittedTime { get; set; }
         public DateTime CompletedTime { get; set; }
-        public Account SubmitterAccount { get; set; }
+        public Guid SubmitterAccountId { get; set; }
         public string Code { get; set; }
         public string Result { get; set; }
     }

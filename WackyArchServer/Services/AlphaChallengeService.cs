@@ -4,6 +4,8 @@ using Newtonsoft.Json;
 using WackyArch.Components;
 using WackyArch.CPUs;
 using WackyArch.Utilities;
+using Microsoft.AspNetCore.Components.Authorization;
+using System.Security.Claims;
 
 namespace WackyArchServer.Services
 {
@@ -11,10 +13,12 @@ namespace WackyArchServer.Services
     {
         public int AllowedCycles = 1_000_000;
         private readonly IDbContextFactory<WAContext> contextFactory;
+        private readonly AuthenticationStateProvider authProvider;
 
-        public AlphaChallengeService(IDbContextFactory<WAContext> contextFactory)
+        public AlphaChallengeService(IDbContextFactory<WAContext> contextFactory, AuthenticationStateProvider authenticationStateProvider)
         {
             this.contextFactory = contextFactory;
+            this.authProvider = authenticationStateProvider;
         }
 
         public AlphaChallenge GetAlphaChallenge(Guid id)
@@ -40,11 +44,14 @@ namespace WackyArchServer.Services
             return outputPorts.Select(op => new ExpectationPort(op.Data.Select(x => new Word { Value = x }).ToList(), op.Name)).ToList();
         }
 
-        public async Task<string> RunAlphaChallengeTests(Guid challengeId, string programText, Account account)
+        public async Task<string> RunAlphaChallengeTests(Guid challengeId, string programText)
         {
             using (var context = await contextFactory.CreateDbContextAsync())
             {
-                var runLog = new RunLog { ChallengeId = challengeId, Code = programText, SubmitterAccount = account, SubmittedTime = DateTime.Now };
+                var user = (await authProvider.GetAuthenticationStateAsync()).User;
+                var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                var runLog = new RunLog { ChallengeId = challengeId, Code = programText, SubmitterAccountId = Guid.Parse(userId), SubmittedTime = DateTime.Now };
 
                 var challenge = GetAlphaChallenge(challengeId);
                 if (challenge == null)
