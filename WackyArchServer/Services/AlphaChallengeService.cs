@@ -6,6 +6,7 @@ using WackyArch.CPUs;
 using WackyArch.Utilities;
 using Microsoft.AspNetCore.Components.Authorization;
 using System.Security.Claims;
+using WackyArchServer.Utilities;
 
 namespace WackyArchServer.Services
 {
@@ -29,6 +30,27 @@ namespace WackyArchServer.Services
             }
         }
 
+        public async Task<List<AlphaChallenge>> GetChallengesCompletedByUser()
+        {
+            using (var context = await contextFactory.CreateDbContextAsync())
+            {
+                var userId = (await authProvider.GetAuthenticationStateAsync()).User.GetUserId();
+
+                return await context.CompletedAlphaChallenges.Where(x => x.AccountId == Guid.Parse(userId)).Select(x => x.AlphaChallenge).ToListAsync();
+            }
+        }
+
+        public async Task<List<AlphaChallenge>> GetUncompletedAvailableChallengesForUser()
+        {
+            using (var context = await contextFactory.CreateDbContextAsync())
+            {
+                var completedChallengeIds = (await GetChallengesCompletedByUser()).Select(x => x.Id).ToHashSet();
+                var availableChallenges = await context.AlphaChallenges.Where(x => (x.Predecessor.Id == null) || completedChallengeIds.Contains(x.Predecessor.Id)).ToListAsync();
+
+                return availableChallenges.Where(x => completedChallengeIds.Contains(x.Id) == false).ToList();
+            }
+        }
+
         public List<FilledPort> GetInputPorts(string inputTextJson)
         {
             var inputPorts = JsonConvert.DeserializeObject<List<AlphaChallengePort>>(inputTextJson);
@@ -45,8 +67,7 @@ namespace WackyArchServer.Services
         {
             using (var context = await contextFactory.CreateDbContextAsync())
             {
-                var user = (await authProvider.GetAuthenticationStateAsync()).User;
-                var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var userId = (await authProvider.GetAuthenticationStateAsync()).User.GetUserId();
 
                 var runLog = new RunLog { ChallengeId = challengeId, Code = programText, SubmitterAccountId = Guid.Parse(userId), SubmittedTime = DateTime.Now };
 

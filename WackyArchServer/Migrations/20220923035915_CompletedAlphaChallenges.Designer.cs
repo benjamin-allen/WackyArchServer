@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WackyArchServer.Model;
 
@@ -11,9 +12,10 @@ using WackyArchServer.Model;
 namespace WackyArchServer.Migrations
 {
     [DbContext(typeof(WAContext))]
-    partial class WAContextModelSnapshot : ModelSnapshot
+    [Migration("20220923035915_CompletedAlphaChallenges")]
+    partial class CompletedAlphaChallenges
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
