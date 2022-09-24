@@ -1,6 +1,6 @@
 ﻿namespace WackyArchServer.Model
 {
-    public class CompletedAlphaChallenges
+    public class CompletedAlphaChallenge
     {
         public Guid Id { get; set; }
         public Guid AccountId { get; set; }

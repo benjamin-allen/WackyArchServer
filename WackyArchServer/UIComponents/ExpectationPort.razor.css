@@ -37,6 +37,7 @@
     margin-right: 0.25em;
     padding-left: 0.5em;
     border-bottom: 1px solid var(--fg-darkgray);
+    line-height: 18px;
 }
 
 .expectation-port-content pre:first-of-type {

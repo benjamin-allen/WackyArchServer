@@ -51,6 +51,23 @@ namespace WackyArchServer.Services
             }
         }
 
+        public async Task CompleteChallenge(Guid alphaChallengeId)
+        {
+            using (var context = await contextFactory.CreateDbContextAsync())
+            {
+                var userId = (await authProvider.GetAuthenticationStateAsync()).User.GetUserId();
+                var alphaChallenge = await context.AlphaChallenges.SingleAsync(x => x.Id == alphaChallengeId);
+                var existingCompletionEntry = await context.CompletedAlphaChallenges.SingleOrDefaultAsync(x => x.AccountId == Guid.Parse(userId) && x.AlphaChallenge.Id == alphaChallengeId);
+
+                if (existingCompletionEntry == null)
+                {
+                    await context.CompletedAlphaChallenges.AddAsync(new CompletedAlphaChallenge { AccountId = Guid.Parse(userId), AlphaChallenge = alphaChallenge });
+                    await context.SaveChangesAsync();
+                }
+                return;
+            }
+        }
+
         public List<FilledPort> GetInputPorts(string inputTextJson)
         {
             var inputPorts = JsonConvert.DeserializeObject<List<AlphaChallengePort>>(inputTextJson);
@@ -135,6 +152,8 @@ namespace WackyArchServer.Services
                 runLog.CompletedTime = DateTime.Now;
                 context.RunLogs.Add(runLog);
                 await context.SaveChangesAsync();
+
+                await CompleteChallenge(challengeId);
                 return challenge.Flag;
             }
         }
