@@ -15,6 +15,7 @@ namespace WackyArchServer.Model
         public string Name { get; set; }
         public string Category { get; set; }
         public string Description { get; set; }
+        public int Order { get; set; }
 
         // These will be JSON Strings, to be decoded.
         // Schema: An array of objects, {"name": "xyz", "data": [1,2,3,4,5]}

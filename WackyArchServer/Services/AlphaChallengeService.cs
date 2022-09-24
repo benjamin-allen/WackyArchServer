@@ -30,7 +30,7 @@ namespace WackyArchServer.Services
             }
         }
 
-        public async Task<List<AlphaChallenge>> GetChallengesCompletedByUser()
+        public async Task<List<AlphaChallenge>> GetChallengesCompletedByUserAsync()
         {
             using (var context = await contextFactory.CreateDbContextAsync())
             {
@@ -40,11 +40,11 @@ namespace WackyArchServer.Services
             }
         }
 
-        public async Task<List<AlphaChallenge>> GetUncompletedAvailableChallengesForUser()
+        public async Task<List<AlphaChallenge>> GetUncompletedAvailableChallengesForUserAsync()
         {
             using (var context = await contextFactory.CreateDbContextAsync())
             {
-                var completedChallengeIds = (await GetChallengesCompletedByUser()).Select(x => x.Id).ToHashSet();
+                var completedChallengeIds = (await GetChallengesCompletedByUserAsync()).Select(x => x.Id).ToHashSet();
                 var availableChallenges = await context.AlphaChallenges.Where(x => (x.Predecessor.Id == null) || completedChallengeIds.Contains(x.Predecessor.Id)).ToListAsync();
 
                 return availableChallenges.Where(x => completedChallengeIds.Contains(x.Id) == false).ToList();
