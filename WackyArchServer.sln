@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WackyArchServer", "WackyArc
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WackyArch", "..\wacky-arch\WackyArch\WackyArch.csproj", "{FD63B506-BC3F-45E7-9561-5C04B89E9D8F}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test", "..\wacky-arch\ComponentsTest\Test.csproj", "{75FC3F04-DCF4-47A9-BF1F-895D55EFB48C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{FD63B506-BC3F-45E7-9561-5C04B89E9D8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FD63B506-BC3F-45E7-9561-5C04B89E9D8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FD63B506-BC3F-45E7-9561-5C04B89E9D8F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{75FC3F04-DCF4-47A9-BF1F-895D55EFB48C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{75FC3F04-DCF4-47A9-BF1F-895D55EFB48C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{75FC3F04-DCF4-47A9-BF1F-895D55EFB48C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{75FC3F04-DCF4-47A9-BF1F-895D55EFB48C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

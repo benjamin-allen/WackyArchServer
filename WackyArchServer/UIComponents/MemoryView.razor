@@ -1,0 +1,74 @@
+﻿@inject IJSRuntime JS
+
+<div id="memory-view-container">
+    <div id="memory-view-memory">
+        <table>
+            <tr>
+                <th></th>
+                <th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th>
+                <th>8</th><th>9</th><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th><th>F</th>
+            </tr>
+        @for (int i = 0; i < Memory.Words.Count() / 16; i++)
+        {
+            <tr class="memory-view-row">
+                <td class="row-label">@(new Word {Value = i }.ToHex().Substring(1))_</td>
+                @for (int j = 0; j < 16; j++)
+                {
+                    var cellIndex = i * 16 + j;
+                    <td id="memory-cell-@cellIndex" 
+                    class="memory-view-cell @(cellIndex == Memory.Address.Data.Value ? "addr-hilite" : "") @(cellIndex == Cpu.GetPCValue() ? "pc-hilite" : "")"
+                    @onclick="(async e => await EditCell(cellIndex))"
+                    >@Memory.Words[cellIndex].ToHex()</td>
+                }
+            </tr>
+        }
+        </table>
+    </div>
+    <div id="memory-view-ports">
+        <div>@(Memory.Data.Name + ": " + Memory.Data.Data.Value + " (0x" + @Memory.Data.Data.ToHex() + ")")</div>
+        <div class="addr">@(Memory.Address.Name + ": " + Memory.Address.Data.Value + " (0x" + @Memory.Address.Data.ToHex() + ")")</div>
+        <div class="pc">PC: @Cpu.GetPCValue() (0x@(new Word { Value = Cpu.GetPCValue()}.ToHex()))</div>
+    </div>
+</div>
+<button @onclick="(async e => Cpu.Cycle())">Cycle CPU</button>
+
+@code {
+    [Parameter, EditorRequired]
+    public Memory Memory { get; set; }
+
+    [Parameter, EditorRequired]
+    public CPU Cpu { get; set; }
+
+    #region JS Interop
+    private IJSObjectReference module { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            module = await JS.InvokeAsync<IJSObjectReference>("import", "./UIComponents/MemoryView.razor.js");
+        }
+    }
+
+    public async Task SetPCPointer(int cell)
+    {
+        await module.InvokeVoidAsync("setPCPointer", cell);
+    }
+
+    public async Task SetAddrPointer(int cell)
+    {
+        await module.InvokeVoidAsync("setAddrPointer", cell);
+    }
+
+    public async Task EditCell(int cell)
+    {
+        var newValue = await module.InvokeAsync<int?>("editCell");
+        if (newValue.HasValue)
+        {
+            Memory.Words[cell] = new Word { Value = newValue.Value };
+        }
+    }
+
+
+    #endregion
+}

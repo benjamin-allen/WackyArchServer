@@ -36,6 +36,7 @@
         selectedComponent = components.First().FullName;
         handleValidSubmit();
         editContext = new EditContext(selectedComponent);
+        cpu.SetPCValue(1);
     }
 
     private void handleValidSubmit()
@@ -51,12 +52,14 @@
 
     #region Testing Data
     private static CPU cpu = new CPU();
+    private static Memory memory = new Memory(512);
     private Dictionary<Type, Dictionary<string, object>> parametersCollection = new Dictionary<Type, Dictionary<string, object>>
     {
         { typeof(CodeBox), new Dictionary<string, object> { { "Cpu", cpu } } },
         { typeof(CPUInfo), new Dictionary<string, object> { { "Cpu", cpu } } },
         { typeof(FilledPort), new Dictionary<string, object> { { "Port", new WackyArch.Components.FilledPort(Enumerable.Range(0, 30).Select(x => new Word { Value = x}).ToList(), new Pipe(), "Test") } } },
-        { typeof(ExpectationPort), new Dictionary<string, object> { { "Port", new WackyArch.Components.ExpectationPort(Enumerable.Range(0, 30).Select(x => new Word { Value = x }).ToList(), "Test") } } }
+        { typeof(ExpectationPort), new Dictionary<string, object> { { "Port", new WackyArch.Components.ExpectationPort(Enumerable.Range(0, 30).Select(x => new Word { Value = x }).ToList(), "Test") } } },
+        { typeof(MemoryView), new Dictionary<string, object> { { "Memory", memory }, { "Cpu", cpu } } }
     };
     #endregion
 }

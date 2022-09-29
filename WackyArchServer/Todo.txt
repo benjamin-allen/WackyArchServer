@@ -1,9 +1,4 @@
-﻿[] A page to List the available challenges for an account
-[] A way to know which accounts have completed which challenges
-[] A way to hide tests so that users can't just brute force an output.
-[x] Styling on AlphaArchitecture
-	[x] Filled Port
-	[x] Expectation Port
+﻿[] A way to hide tests so that users can't just brute force an output.
 [] Editing the program should be disabled when a program is loaded?
 [] Gamma puzzles? Ask for a single line of assembly that does something?
 	[] zero a register in 1 line
@@ -14,11 +9,12 @@
 	[] Memory View
 	[] Disassembly View
 	[] Input Box
-[] Async DB reads. Now that we're on SQL server does it work right?
-[] Things to find room in the ISA for:
-	[] UNLOCK command
-	[] Other cryptographic primitives?
-	[] 
+[] Build a stack machine for use with FUNCTION
 
-[] AUTHENTICATION
-	
+[] What to do about holes in the PCLineMap?
+
+[] BETA Challenge Ideas
+	[] Just view disassembly to determine the outputs
+	[] View disassembly and have to do some math or scripting on the side
+	[] Challenge where they can write to memory
+	[] Challenge where memory is write-protected (stack smashing)
