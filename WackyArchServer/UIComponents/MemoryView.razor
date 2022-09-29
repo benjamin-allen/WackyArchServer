@@ -30,7 +30,6 @@
         <div class="pc">PC: @Cpu.GetPCValue() (0x@(new Word { Value = Cpu.GetPCValue()}.ToHex()))</div>
     </div>
 </div>
-<button @onclick="(async e => Cpu.Cycle())">Cycle CPU</button>
 
 @code {
     [Parameter, EditorRequired]

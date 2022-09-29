@@ -12,6 +12,9 @@
     [Parameter, EditorRequired]
     public CPU Cpu { get; set; }
 
+    [Parameter, EditorRequired]
+    public bool Disabled { get; set; }
+
     private string infoMessage { get; set; } = "";
 
 
@@ -24,12 +27,21 @@
         {
             module = await JS.InvokeAsync<IJSObjectReference>("import", "./UIComponents/CodeBox.razor.js");
             await module.InvokeVoidAsync("setup");
+            if (Disabled)
+            {
+                await module.InvokeVoidAsync("disable");
+            }
         }
     }
 
     public async Task<string> GetText()
     {
         return await module.InvokeAsync<string>("getText");
+    }
+
+    public async Task SetText(string text)
+    {
+        await module.InvokeVoidAsync("setText", text);
     }
 
     /// <summary>
