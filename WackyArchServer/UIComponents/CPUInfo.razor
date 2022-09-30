@@ -12,10 +12,13 @@
         </div>
     </div>
     <div id="cpuinfo-controls">
+        @if(ShowLoadButton)
+        {   
         <button id="top-button" @onclick="args => RunEvent(LoadButtonPressed)" disabled=@loadButtonDisabled>
             <span class="oi oi-data-transfer-download"></span>
             Load Program
         </button>
+        }
         <button @onclick="args => RunEvent(StepButtonPressed)" disabled=@stepButtonDisabled>
             <span class="oi oi-arrow-thick-right"></span>
             Step
@@ -35,12 +38,14 @@
     </div>
 </div>
 
-@code {
+    @code {
     [Parameter, EditorRequired]
     public CPU Cpu { get; set; }
 
     [Parameter]
     public EventCallback LoadButtonPressed { get; set; }
+    [Parameter]
+    public bool ShowLoadButton { get; set; } = true;
     [Parameter]
     public EventCallback StepButtonPressed { get; set; }
     [Parameter]

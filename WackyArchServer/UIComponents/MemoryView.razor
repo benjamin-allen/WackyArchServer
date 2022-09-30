@@ -38,6 +38,9 @@
     [Parameter, EditorRequired]
     public CPU Cpu { get; set; }
 
+    [Parameter]
+    public EventCallback OnMemoryChanged { get; set; }
+
     #region JS Interop
     private IJSObjectReference module { get; set; }
 
@@ -65,9 +68,8 @@
         if (newValue.HasValue)
         {
             Memory.Words[cell] = new Word { Value = newValue.Value };
+            await OnMemoryChanged.InvokeAsync();
         }
     }
-
-
     #endregion
 }

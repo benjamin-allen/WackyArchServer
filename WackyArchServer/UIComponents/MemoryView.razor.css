@@ -33,6 +33,15 @@
     border-collapse: separate;
 }
 
+#memory-view-memory td {
+    cursor: pointer;
+    border: 1px solid var(--bg-green-light);
+}
+
+#memory-view-memory td:hover {
+    border: 1px solid var(--fg-darkgray);
+}
+
 #memory-view-ports {
     border: 3px solid var(--fg-darkgray);
     padding-top: 0.2em;
