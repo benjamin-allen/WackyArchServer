@@ -8,6 +8,7 @@
         <FilledPort Port="UserInputPort"></FilledPort>
         <CodeBox Disabled=true @ref="codeBox"></CodeBox>
         <CPUInfo Cpu="Cpu" ShowLoadButton="false" ResetButtonPressed="Reset" StepButtonPressed="Step" RunButtonPressed="Run" SubmitButtonPressed="Submit"></CPUInfo>
+        <StackView Stack="Cpu.Stack"></StackView>
         <MemoryView Cpu="Cpu" Memory="Memory" OnMemoryChanged="MemoryChanged"></MemoryView>
     </div>
     <div id="beta-arch-input">

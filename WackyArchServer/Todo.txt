@@ -1,17 +1,20 @@
 ﻿[] A way to hide tests so that users can't just brute force an output.
-[] Editing the program should be disabled when a program is loaded?
 [] Gamma puzzles? Ask for a single line of assembly that does something?
 	[] zero a register in 1 line
 	[] set a register to 1 in one line
 	[] shortcut a jump by using jump-address
 	[] stop an infinite loop with jump-address
 [] Beta Architecture Components
-	[] Memory View
-	[] Disassembly View
-	[] Input Box
-[] Build a stack machine for use with FUNCTION
+	[x] Memory View
+	[x] Disassembly View
+	[x] Input Box
+	[] STYLING - WOOOO
 
-[] What to do about holes in the PCLineMap?
+[] BetaChallengeService
+
+[] Get the thing into Azure
+	[] Step 1: Spin up an Azure DB and point the game to that.
+	[] Step 2: Spin up an Application Service and point the game to that.
 
 [] BETA Challenge Ideas
 	[] Just view disassembly to determine the outputs
