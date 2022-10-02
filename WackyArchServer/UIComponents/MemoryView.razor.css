@@ -1,17 +1,17 @@
 ﻿#memory-view-container {
-    width: 700px;
+    width: 620px;
     max-height: 420px;
-    height: 100%;
-    background-color: var(--bg-green-light);
+    min-height: 300px;
     color: var(--fg-darkgray);
     display: flex;
     flex-direction: column;
 }
 
 #memory-view-memory {
+    background-color: var(--bg-green-light);
     width: 100%;
-    overflow-y: scroll;
-    border: 3px solid var(--fg-darkgray);
+    overflow-y: auto;
+    border: 2px solid var(--fg-darkgray);
 }
 
 #memory-view-memory table {
@@ -36,15 +36,16 @@
 
 #memory-view-memory td {
     cursor: pointer;
-    border: 1px solid var(--bg-green-light);
 }
 
 #memory-view-memory td:hover {
-    border: 1px solid var(--fg-darkgray);
+    background-color: var(--fg-darkgray);
+    color: var(--bg-green-light);
 }
 
 #memory-view-ports {
-    border: 3px solid var(--fg-darkgray);
+    background-color: var(--bg-green-light);
+    border: 2px solid var(--fg-darkgray);
     padding-top: 0.2em;
     padding-bottom: 0.2em;
     border-top: none;

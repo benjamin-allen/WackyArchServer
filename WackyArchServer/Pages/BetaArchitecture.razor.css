@@ -1,0 +1,98 @@
+﻿#beta-arch-container {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+    flex-flow: column;
+    row-gap: 1em;
+    /* background-color: var(--bg-green-dark); */
+    border: 1px solid black;
+}
+
+#beta-arch-emulator-container {
+    width: 100%;
+    max-height: 650px;
+    display: flex;
+    flex-flow: row;
+    column-gap: 2em;
+    border: 1px solid red;
+}
+
+#beta-arch-input-container {
+    max-width: 20%;
+    display: flex;
+    flex-flow: row;
+    column-gap: 1em;
+}
+
+#beta-arch-input {
+    min-width: 220px;
+    overflow-y: auto;
+}
+
+#beta-arch-input table {
+    min-width: 205px;
+    background-color: var(--bg-green-light);
+    border: 2px solid var(--fg-darkgray);
+}
+
+#beta-arch-input tr {
+    border-bottom: 1px solid var(--fg-darkgray);
+}
+
+#beta-arch-input .value {
+    width: 50%;
+    text-align: center;
+}
+
+#beta-arch-input td.value:hover {
+    background-color: var(--fg-darkgray);
+    color: var(--bg-green-light);
+    cursor: pointer;
+}
+
+#beta-arch-input .actions {
+    min-width: 30px;
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+    font-weigth: bold;
+}
+
+#beta-arch-input button {
+    margin-left: 0.2em;
+    margin-right: 0.2em;
+    background-color: var(--bg-green);
+    color: var(--fg-white);
+    outline: none;
+    border: none;
+    border-radius: 6px;
+    box-shadow: 0 4px #444;
+}
+
+#beta-arch-input button:active {
+    background-color: var(--bg-green-dark);
+    box-shadow: 0 1px #222;
+    transform: translateY(3px);
+}
+
+#beta-arch-input button:hover {
+    background-color: var(--bg-green-dark);
+}
+
+#beta-arch-code {
+    max-width: 40%;
+    display: flex;
+    flex-direction: column;
+}
+
+#beta-arch-memory {
+    display: flex;
+    flex-direction: row;
+    column-gap: 0.5em;
+}
+
+.beta-center {
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+}

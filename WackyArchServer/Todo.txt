@@ -19,5 +19,10 @@
 [] BETA Challenge Ideas
 	[] Just view disassembly to determine the outputs
 	[] View disassembly and have to do some math or scripting on the side
+		[] CRC-8?
 	[] Challenge where they can write to memory
 	[] Challenge where memory is write-protected (stack smashing)
+
+[] ALPHA Challenge Ideas
+	[] bit rotator, since the old one got removed
+	[] Signal interpreter? 5 input pipes, output the number of the pipe that that's 1 at this time

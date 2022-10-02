@@ -5,37 +5,51 @@
 <div id="beta-arch-container">
     <div id="beta-description"></div>
     <div id="beta-arch-emulator-container">
-        <FilledPort Port="UserInputPort"></FilledPort>
-        <CodeBox Disabled=true @ref="codeBox"></CodeBox>
-        <CPUInfo Cpu="Cpu" ShowLoadButton="false" ResetButtonPressed="Reset" StepButtonPressed="Step" RunButtonPressed="Run" SubmitButtonPressed="Submit"></CPUInfo>
-        <StackView Stack="Cpu.Stack"></StackView>
-        <MemoryView Cpu="Cpu" Memory="Memory" OnMemoryChanged="MemoryChanged"></MemoryView>
-    </div>
-    <div id="beta-arch-input">
-        <table>
-            @for (int i = 0; i < PreparedInput.Count; i++)
-            {
-                var j = i;
-                <tr>
-                    <td>@i</td>
-                    <td>@PreparedInput[j]</td>
-                    <td><button @onclick="(async () => await Add(j))">+</button></td>
-                    <td><button @onclick="(async () => await Delete(j))">-</button></td>
-                </tr>
-            }
-            <tr>
-                <td></td>
-                <td></td>
-                <td><button @onclick="(async () => await Add(PreparedInput.Count))">+</button></td>
-                <td></td>
-            </tr>
-        </table>
+        <div id="beta-arch-input-container">
+            <div id="beta-arch-input">
+                <table>
+                    <tr>
+                        <th>Idx</th>
+                        <th class="value">Value</th>
+                        <th class="actions"></th>
+                    </tr>
+                    @for (int i = 0; i < PreparedInput.Count; i++)
+                    {
+                        var j = i;
+                        <tr>
+                            <td>@i</td>
+                            <td class="value">0x@(new Word { Value = PreparedInput[j] }.ToHex())</td>
+                            <td class="actions"><button @onclick="(async () => await Add(j))">+</button><button @onclick="(async () => await Delete(j))">-</button></td>
+                        </tr>
+                    }
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td class="actions"><button @onclick="(async () => await Add(PreparedInput.Count))">+</button></td>
+                    </tr>
+                </table>
+            </div>
+            <div id="beta-arch-input-view">
+                <FilledPort Port="UserInputPort"></FilledPort>
+            </div>
+        </div>
+        <div id="beta-arch-code">
+            <div class="beta-center">
+                <CodeBox Disabled=false @ref="codeBox"></CodeBox>
+            </div>
+            <div class="beta-center">
+                <CPUInfo Cpu="Cpu" ShowLoadButton="true" LoadButtonPressed="Load" ResetButtonPressed="Reset" StepButtonPressed="Step" RunButtonPressed="Run" SubmitButtonPressed="Submit"></CPUInfo>
+            </div>
+        </div>
+        <div id="beta-arch-memory">
+            <MemoryView Cpu="Cpu" Memory="Cpu.Memory" OnMemoryChanged="MemoryChanged"></MemoryView>
+            <StackView Stack="Cpu.Stack"></StackView>
+        </div>
     </div>
 </div>
 
 @code {
     private StackCPU Cpu { get; set; } = new();
-    private Memory Memory { get; set; } = new(2);
     private List<WackyArch.Components.FilledPort> InputPorts { get; set; } = new();
     private List<ICyclable> cyclables = new();
 
@@ -48,24 +62,20 @@
     {
         await base.OnInitializedAsync();
 
-        Memory = new Memory(256);
-        var dataPort = new Port(Memory.Data, "DATA");
-        var addrPort = new Port(Memory.Address, "ADDR");
         UserInputPort = new WackyArch.Components.FilledPort(PreparedInput.Select(x => new Word { Value = x }).ToList(), new Pipe(), "KP");
-        Cpu = new StackCPU(new Port[] { dataPort, addrPort, UserInputPort });
-        cyclables = new List<ICyclable> { Cpu, Memory, UserInputPort };
+        Cpu = new StackCPU(new Port[] { UserInputPort });
+        cyclables = new List<ICyclable> { Cpu, UserInputPort };
     }
 
     private async Task MemoryChanged()
     {
         // Get binary and disassemble it
-        var binary = Memory.Words;
-        var programText = Disassembler.Disassemble(Cpu, binary.ToList(), out var pcLineMap);
-        Cpu.PcLineMap = pcLineMap;
-        Cpu.ProgramBinary = binary.ToList();
+        var binary = Disassembler.ShrinkBinary(Cpu.Memory.Words.ToList());
+        Cpu.Load(binary);
+        Cpu.Reset();
 
         // Set the codebox text to the new code.
-        await codeBox.SetText(programText);
+        await codeBox.SetText(Cpu.ProgramText);
         await codeBox.SetLinePointer(0, false);
     }
 
@@ -79,17 +89,19 @@
         PreparedInput.RemoveAt(i);
     }
 
+    private async Task Load()
+    {
+        var words = Assembler.Assemble(Cpu, await codeBox.GetText(), out _);
+        Cpu.Load(words);
+
+        UserInputPort.SetLoadedData(PreparedInput.Select(x => new Word { Value = x }).ToList());
+        await MemoryChanged();
+    }
+
     private async Task Reset()
     {
+        UserInputPort.SetLoadedData(PreparedInput.Select(x => new Word { Value = x }).ToList());
         cyclables.ForEach(c => c.Reset());
-
-        // Load memory with program
-
-        UserInputPort = new WackyArch.Components.FilledPort(PreparedInput.Select(x => new Word { Value = x }).ToList(), new Pipe(), "INPUT");
-        var dataPort = new Port(Memory.Data, "DATA");
-        var addrPort = new Port(Memory.Address, "ADDR");
-        Cpu = new StackCPU(new Port[] { dataPort, addrPort, UserInputPort });
-        cyclables = new List<ICyclable> { Cpu, Memory, UserInputPort };
 
         codeBox.SetInfoMessage("System Reset");
         await MemoryChanged();

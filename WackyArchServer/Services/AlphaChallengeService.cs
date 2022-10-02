@@ -92,7 +92,7 @@ namespace WackyArchServer.Services
                 if (challenge == null)
                 {
                     runLog.CompletedTime = DateTime.Now;
-                    runLog.Result = $"Challenge {challengeId} not found";
+                    runLog.Result = $"Alpha Challenge {challengeId} not found";
                     context.RunLogs.Add(runLog);
                     await context.SaveChangesAsync();
                     return "Challenge not found.";
@@ -127,6 +127,22 @@ namespace WackyArchServer.Services
                             context.RunLogs.Add(runLog);
                             await context.SaveChangesAsync();
                             return $"A test failed. {cex.Message}";
+                        }
+                        catch (Interrupt it)
+                        {
+                            switch (it.InterruptType)
+                            {
+                                case InterruptType.UNLOCK:
+                                    runLog.Result = challenge.Flag; break;
+                                case InterruptType.HALT:
+                                    runLog.Result = "INT HALT"; break;
+                                case InterruptType.END:
+                                    runLog.Result = "INT END"; break;
+                            }
+                            runLog.CompletedTime = DateTime.Now;
+                            context.RunLogs.Add(runLog);
+                            await context.SaveChangesAsync();
+                            return $"Program interrupted unexpectedly: {runLog.Result}";
                         }
                         if (cpu.IsErrored || cpu.IsHalted)
                         {
