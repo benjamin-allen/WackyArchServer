@@ -11,7 +11,7 @@ namespace WackyArchServer.Services
 {
     public class BetaChallengeService
     {
-        public int AllowedCycles = 1_000_000;
+        public int AllowedCycles = 100_000;
         private readonly IDbContextFactory<WAContext> contextFactory;
         private readonly AuthenticationStateProvider authProvider;
 
@@ -90,42 +90,41 @@ namespace WackyArchServer.Services
                 }
 
                 // Run the beta challenge executable with the provided input
-                var memory = new Memory(256);
-                var dataPort = new Port(memory.Data, "DATA");
-                var addrPort = new Port(memory.Address, "ADDR");
                 var userInPort = new FilledPort(inputWords, new Pipe(), "KP");
-                var cpu = new StackCPU(new Port[] { dataPort, addrPort, userInPort });
-                var cyclables = new List<ICyclable> { cpu, memory, userInPort };
+                var cpu = new StackCPU(new Port[] { userInPort });
+                var cyclables = new List<ICyclable> { cpu, userInPort };
 
                 var programBinary = GetInputProgramBinary(challenge.InputProgramJson);
                 cpu.Load(programBinary);
 
                 string outputMessage = "";
 
-                for(int i = 0; i < AllowedCycles; i++)
+                try
                 {
-                    try
+                    for (int i = 0; i < AllowedCycles; i++)
                     {
                         cyclables.ForEach(c => c.Cycle());
                     }
-                    catch (ComponentException cex)
+                }
+                catch (ComponentException cex)
+                {
+                    outputMessage = $"A test failed: {cex.Message}";
+                }
+                catch (Interrupt it)
+                {
+                    switch (it.InterruptType)
                     {
-                        outputMessage = $"A test failed: {cex.Message}";
-                        break;
+                        case InterruptType.UNLOCK:
+                            outputMessage = challenge.Flag; break;
+                        case InterruptType.HALT:
+                            outputMessage = "INT HALT"; break;
+                        case InterruptType.END:
+                            outputMessage = "INT END"; break;
                     }
-                    catch (Interrupt it)
-                    {
-                        switch (it.InterruptType)
-                        {
-                            case InterruptType.UNLOCK:
-                                outputMessage = challenge.Flag; break;
-                            case InterruptType.HALT:
-                                outputMessage = "INT HALT"; break;
-                            case InterruptType.END:
-                                outputMessage = "INT END"; break;
-                        }
-                        break;
-                    }
+                }
+                if (outputMessage == "")
+                {
+                    outputMessage = $"The program did not finish in {AllowedCycles} cycles.";
                 }
 
                 runLog.Result = outputMessage;

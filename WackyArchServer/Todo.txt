@@ -10,7 +10,9 @@
 	[x] Input Box
 	[] STYLING - WOOOO
 
-[] BetaChallengeService
+[] BUGS
+
+[x] BetaChallengeService
 
 [] Get the thing into Azure
 	[] Step 1: Spin up an Azure DB and point the game to that.
@@ -18,6 +20,7 @@
 
 [] BETA Challenge Ideas
 	[] Just view disassembly to determine the outputs
+	[] Actually do the disassembly by sticking a 0x4FF at the beginning of the code, so they have to manually disassemble.
 	[] View disassembly and have to do some math or scripting on the side
 		[] CRC-8?
 	[] Challenge where they can write to memory

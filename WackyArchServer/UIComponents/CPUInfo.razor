@@ -86,7 +86,7 @@
             runButtonDisabled = true;
             resetButtonDisabled = false;
         }
-        else if (Cpu.IsHalted && !Cpu.IsErrored)
+        else if (Cpu.IsHalted && !Cpu.IsInterrupted)
         {
             CpuStatus = "READY";
             loadButtonDisabled = true;
@@ -94,9 +94,9 @@
             runButtonDisabled = false;
             resetButtonDisabled = false;
         }
-        else if (Cpu.IsErrored)
+        else if (Cpu.IsInterrupted)
         {
-            CpuStatus = "ERROR";
+            CpuStatus = "ERR/INT";
             loadButtonDisabled = false;
             stepButtonDisabled = true;
             runButtonDisabled = true;

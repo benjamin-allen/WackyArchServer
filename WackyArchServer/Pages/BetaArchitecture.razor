@@ -1,9 +1,11 @@
-﻿@page "/beta"
+﻿@page "/beta/{ChallengeIdString}"
+@page "/beta"
 
+@inject IJSRuntime JS
 @using WackyArchServer.Model
 
 <div id="beta-arch-container">
-    <div id="beta-description"></div>
+    <div id="beta-description">@Description</div>
     <div id="beta-arch-emulator-container">
         <div id="beta-arch-input-container">
             <div id="beta-arch-input">
@@ -18,7 +20,7 @@
                         var j = i;
                         <tr>
                             <td>@i</td>
-                            <td class="value">0x@(new Word { Value = PreparedInput[j] }.ToHex())</td>
+                            <td class="value" @onclick="(async () => await Edit(j))">0x@(new Word { Value = PreparedInput[j] }.ToHex())</td>
                             <td class="actions"><button @onclick="(async () => await Add(j))">+</button><button @onclick="(async () => await Delete(j))">-</button></td>
                         </tr>
                     }
@@ -35,10 +37,10 @@
         </div>
         <div id="beta-arch-code">
             <div class="beta-center">
-                <CodeBox Disabled=false @ref="codeBox"></CodeBox>
+                <CodeBox Disabled=@(!IsSandbox) @ref="codeBox"></CodeBox>
             </div>
             <div class="beta-center">
-                <CPUInfo Cpu="Cpu" ShowLoadButton="true" LoadButtonPressed="Load" ResetButtonPressed="Reset" StepButtonPressed="Step" RunButtonPressed="Run" SubmitButtonPressed="Submit"></CPUInfo>
+                <CPUInfo @ref="cpuInfo" Cpu="Cpu" ShowLoadButton="@IsSandbox" LoadButtonPressed="Load" ResetButtonPressed="Reset" StepButtonPressed="Step" RunButtonPressed="Run" SubmitButtonPressed="Submit"></CPUInfo>
             </div>
         </div>
         <div id="beta-arch-memory">
@@ -49,22 +51,65 @@
 </div>
 
 @code {
-    private StackCPU Cpu { get; set; } = new();
-    private List<WackyArch.Components.FilledPort> InputPorts { get; set; } = new();
-    private List<ICyclable> cyclables = new();
+    [Parameter]
+    public string ChallengeIdString { get; set; }
+    public Guid ChallengeId { get; set; }
 
+    private string Description { get; set; } = "";
+
+    private StackCPU Cpu { get; set; } = new();
+    private List<ICyclable> cyclables = new();
     private WackyArch.Components.FilledPort UserInputPort { get; set; } = new(new List<Word>(), new Pipe(), "KP");
     private List<int> PreparedInput { get; set; } = new();
 
     private WackyArchServer.UIComponents.CodeBox codeBox;
+    private WackyArchServer.UIComponents.CPUInfo cpuInfo;
+    private bool IsSandbox = false;
+    private bool IsReset = false;
+    private IJSObjectReference module { get; set; }
+
+    [Inject]
+    private BetaChallengeService betaChallengeService { get; set; }
+    private BetaChallenge betaChallenge { get; set; }
 
     protected async override Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
+        Guid challengeId;
 
         UserInputPort = new WackyArch.Components.FilledPort(PreparedInput.Select(x => new Word { Value = x }).ToList(), new Pipe(), "KP");
         Cpu = new StackCPU(new Port[] { UserInputPort });
         cyclables = new List<ICyclable> { Cpu, UserInputPort };
+
+        if (!Guid.TryParse(ChallengeIdString, out challengeId))
+        {
+            // Do something. Empty Arch so they have a sandbox?
+            IsSandbox = true;
+            Description = "This is a sandbox. You can experiment with programs here.";
+        }
+        else
+        {
+            ChallengeId = challengeId;
+            var userCompletedChallenges = (await betaChallengeService.GetBetaChallengesCompletedByUserAsync()).Select(x => x.Id).ToHashSet();
+            var userAvailableChallenges = (await betaChallengeService.GetUncompletedAvailableBetaChallengesForUserAsync()).Select(x => x.Id).ToHashSet();
+            if (userCompletedChallenges.Contains(ChallengeId) || userAvailableChallenges.Contains(ChallengeId))
+            {
+                IsSandbox = false;
+                betaChallenge = await betaChallengeService.GetBetaChallengeAsync(ChallengeId);
+                var program = betaChallengeService.GetInputProgramBinary(betaChallenge.InputProgramJson);
+                Cpu.Load(program);
+                await MemoryChanged();
+                Description = betaChallenge.Description;
+            }
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            module = await JS.InvokeAsync<IJSObjectReference>("import", "./Pages/BetaArchitecture.razor.js");
+        }    
     }
 
     private async Task MemoryChanged()
@@ -81,7 +126,20 @@
 
     private async Task Add(int i)
     {
-        PreparedInput.Insert(i, i);
+        var newValue = await module.InvokeAsync<int>("editCell");
+        if (newValue != 0xDEDBEEF)
+        {
+            PreparedInput.Insert(i, new Word { Value = newValue }.Value);
+        }
+    }
+
+    private async Task Edit(int i)
+    {
+        var newValue = await module.InvokeAsync<int>("editCell");
+        if (newValue != 0xDEDBEEF)
+        {
+            PreparedInput[i] = new Word {Value = newValue}.Value;
+        }
     }
 
     private async Task Delete(int i)
@@ -100,6 +158,7 @@
 
     private async Task Reset()
     {
+        IsReset = true;
         UserInputPort.SetLoadedData(PreparedInput.Select(x => new Word { Value = x }).ToList());
         cyclables.ForEach(c => c.Reset());
 
@@ -110,6 +169,7 @@
 
     private async Task Step()
     {
+        IsReset = false;
         try
         {
             codeBox.SetInfoMessage("");
@@ -126,22 +186,23 @@
         catch (ComponentException cex)
         {
             codeBox.SetInfoMessage(cex.ShortMessage);
-            Cpu.IsErrored = true;
+            Cpu.IsInterrupted = true;
         }
         catch (Interrupt i)
         {
             switch (i.InterruptType)
             {
                 case InterruptType.UNLOCK:
-                    codeBox.SetInfoMessage("== Unlocked =="); break;
+                    codeBox.SetInfoMessage("== Unlocked =="); cpuInfo.DisableSubmitButton(false); break;
                 case InterruptType.HALT:
                     codeBox.SetInfoMessage("== Halted =="); break;
             }
+            StateHasChanged();
         }
         finally
         {
             var isInLineMap = Cpu.PcLineMap.TryGetValue(Cpu.GetPCValue(), out int currentLine);
-            await codeBox.SetLinePointer(isInLineMap ? currentLine+1 : 0, Cpu.IsErrored);
+            await codeBox.SetLinePointer(isInLineMap ? currentLine+1 : 0, Cpu.IsInterrupted);
             StateHasChanged();
         }
     }
@@ -153,14 +214,19 @@
             await Step();
             StateHasChanged();
             await Task.Delay(1);
-        } while (Cpu.IsHalted == false && Cpu.IsErrored == false);
+        } while (Cpu.IsHalted == false && Cpu.IsInterrupted == false && IsReset == false);
     }
 
     private async Task Submit()
     {
-        codeBox.SetInfoMessage("Submitted");
+        codeBox.SetInfoMessage("Submitted...");
         StateHasChanged();
 
         // Todo: gather the input from the user's input manager and sent it to the service
+        var kpInput = PreparedInput.Select(x => new Word { Value = x }).ToList();
+        await Task.Delay(1000);
+        var result = await betaChallengeService.RunBetaChallenge(ChallengeId, kpInput);
+        codeBox.SetInfoMessage(result);
+        StateHasChanged();
     }
 }

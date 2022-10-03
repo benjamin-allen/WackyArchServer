@@ -1,9 +1,8 @@
 ﻿<AuthorizeView>
     <Authorized>
-        <a href="Identity/Account/Manage">Logged in as  @context.User.Identity?.Name!</a>
+        <a href="Identity/Account/Manage">Logged in as  @context.User.Identity?.Name</a>
     </Authorized>
     <NotAuthorized>
-        <a href="Identity/Account/Register">Register</a>
         <a href="Identity/Account/Login">Log in</a>
     </NotAuthorized>
 </AuthorizeView>

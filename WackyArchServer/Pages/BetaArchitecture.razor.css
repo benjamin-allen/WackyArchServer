@@ -5,8 +5,7 @@
     display: flex;
     flex-flow: column;
     row-gap: 1em;
-    /* background-color: var(--bg-green-dark); */
-    border: 1px solid black;
+    background-color: var(--bg-green-dark);
 }
 
 #beta-arch-emulator-container {
@@ -15,7 +14,6 @@
     display: flex;
     flex-flow: row;
     column-gap: 2em;
-    border: 1px solid red;
 }
 
 #beta-arch-input-container {
@@ -53,9 +51,10 @@
 
 #beta-arch-input .actions {
     min-width: 30px;
-    padding-top: 0.5em;
-    padding-bottom: 0.5em;
-    font-weigth: bold;
+    padding-top: 0.2em;
+    padding-bottom: 0.3em;
+    font-weight: bold;
+    font-size: 20px;
 }
 
 #beta-arch-input button {
@@ -95,4 +94,18 @@
     margin-left: auto;
     margin-right: auto;
     display: block;
+}
+
+#beta-arch-container #beta-description {
+    background-color: var(--bg-green-light);
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+    padding-left: 1em;
+    padding-right: 1em;
+    font-family: monospace, Arial, Helvetica, sans-serif;
+    min-height: 3em;
+    max-height: 7em;
+    overflow-y: auto;
+    white-space: pre-line;
+    line-height: 20px;
 }

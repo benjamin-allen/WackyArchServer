@@ -31,6 +31,7 @@ html, body {
     font-family: monospace, sans-serif !important;
     font-size: 16px;
     line-height: 16px;
+    height: 100vh;
 }
 
 h1:focus {
@@ -91,3 +92,12 @@ a, .btn-link {
     .blazor-error-boundary::after {
         content: "An error has occurred."
     }
+
+.page {
+    height: 100%;
+    background-color: var(--bg-green-dark);
+}
+
+a {
+    font-weight: bold;
+}

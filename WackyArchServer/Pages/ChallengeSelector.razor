@@ -1,0 +1,74 @@
+﻿@page "/challenges"
+
+@using WackyArchServer.Model
+
+<div id="alpha-challenges-container">
+    @foreach(var category in AlphaChallengesByCategory.Keys)
+    {
+        <div class="category-container">
+            <div class="category-title">@category</div>
+            <div class="category-content">
+                @foreach(var challenge in AlphaChallengesByCategory[category])
+                {
+                    @if (CompletedChallenges.Contains(challenge.Id))
+                    {
+                        
+                        <a class="completed-challenge" href="/alpha/@challenge.Id">@challenge.Name</a><br />
+                    }
+                    else
+                    {
+                        <a class="uncompleted-challenge" href="/alpha/@challenge.Id">@challenge.Name</a><br />
+                    }
+                }
+            </div>
+        </div>
+    }
+
+    @foreach(var category in BetaChallengesByCategory.Keys)
+    {
+        <div class="category-container">
+            <div class="category-title">@category</div>
+            <div class="category-content">
+                @foreach (var challenge in BetaChallengesByCategory[category])
+                {
+                    @if (CompletedChallenges.Contains(challenge.Id))
+                    {
+                        <a class="completed-challenge" href="/beta/@challenge.Id">@challenge.Name</a><br />
+                    }
+                    else
+                    {
+                        <a class="uncompleted-challenge" href="/beta/@challenge.Id">@challenge.Name</a><br />
+                    }
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    public Dictionary<string, List<AlphaChallenge>> AlphaChallengesByCategory = new();
+    public Dictionary<string, List<BetaChallenge>> BetaChallengesByCategory = new();
+    public HashSet<Guid> CompletedChallenges = new();
+
+    [Inject]
+    private AlphaChallengeService alphaChallengeService { get; set; }
+
+    [Inject]
+    private BetaChallengeService betaChallengeService { get; set; }
+
+    protected async override Task OnInitializedAsync()
+    {
+        // Get all the user's completed Challenges
+        var availableAlphaChallenges = await alphaChallengeService.GetUncompletedAvailableChallengesForUserAsync();
+        var completedAlphaChallenges = await alphaChallengeService.GetChallengesCompletedByUserAsync();
+        var allAlphaChallenges = new List<AlphaChallenge>().Concat(availableAlphaChallenges).Concat(completedAlphaChallenges);
+
+        var availableBetaChallenges = await betaChallengeService.GetUncompletedAvailableBetaChallengesForUserAsync();
+        var completedBetaChallenges = await betaChallengeService.GetBetaChallengesCompletedByUserAsync();
+        var allBetaChallenges = new List<BetaChallenge>().Concat(availableBetaChallenges).Concat(completedBetaChallenges);
+
+        AlphaChallengesByCategory = allAlphaChallenges.GroupBy(x => x.Category).ToDictionary(k => k.Key, v => v.OrderBy(x => x.Order).ToList());
+        BetaChallengesByCategory = allBetaChallenges.GroupBy(x => x.Category).ToDictionary(k => k.Key, v => v.OrderBy(x => x.Order).ToList());
+        CompletedChallenges = completedAlphaChallenges.Select(x => x.Id).Concat(completedBetaChallenges.Select(x => x.Id)).ToHashSet();
+    }
+}

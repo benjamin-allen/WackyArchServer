@@ -1,4 +1,5 @@
 ﻿@page "/alpha/{ChallengeIdString}"
+@page "/alpha"
 
 @using WackyArchServer.Model
 
@@ -62,20 +63,28 @@
         if (!Guid.TryParse(ChallengeIdString, out challengeId))
         {
             // Do something. Empty Arch so they have a sandbox?
+            InputPorts = new();
+            OutputPorts = new();
+            Description = "This is a sandbox. You can experiment with writing programs, but no ports are provided.";
         }
-        ChallengeId = challengeId;
+        else
+        {
+            ChallengeId = challengeId;
+            var userCompletedChallenges = (await alphaChallengeService.GetChallengesCompletedByUserAsync()).Select(x => x.Id).ToHashSet();
+            var userAvailableChallenges = (await alphaChallengeService.GetUncompletedAvailableChallengesForUserAsync()).Select(x => x.Id).ToHashSet();
+            if (userCompletedChallenges.Contains(ChallengeId) || userAvailableChallenges.Contains(ChallengeId))
+            {
+                alphaChallenge = await alphaChallengeService.GetAlphaChallengeAsync(ChallengeId);
+                InputPorts = alphaChallengeService.GetInputPorts(alphaChallenge.InputTextJson);
+                OutputPorts = alphaChallengeService.GetOutputPorts(alphaChallenge.OutputTextJson);
+                Description = alphaChallenge.Description;
+            }
+        }
 
-        alphaChallenge = await alphaChallengeService.GetAlphaChallengeAsync(ChallengeId);
-
-        InputPorts = alphaChallengeService.GetInputPorts(alphaChallenge.InputTextJson);
-        OutputPorts = alphaChallengeService.GetOutputPorts(alphaChallenge.OutputTextJson);
-        var ports = new List<Port>(InputPorts);
-        ports.AddRange(OutputPorts);
+        var ports = new List<Port>(InputPorts).Concat(OutputPorts).ToArray();
         Cpu = new InterpreterCPU(ports.ToArray());
         cyclables = new List<ICyclable> { Cpu };
         cyclables.AddRange(ports);
-
-        Description = alphaChallenge.Description;
     }
 
     private async Task LoadProgram()
@@ -131,12 +140,12 @@
         catch (ComponentException cex)
         {
             codeBox.SetInfoMessage(cex.ShortMessage);
-            Cpu.IsErrored = true;
+            Cpu.IsInterrupted = true;
         }
         finally
         {
             var isInLineMap = Cpu.PcLineMap.TryGetValue(Cpu.GetPCValue(), out int currentLine);
-            await codeBox.SetLinePointer(isInLineMap ? currentLine+1 : 0, Cpu.IsErrored);
+            await codeBox.SetLinePointer(isInLineMap ? currentLine+1 : 0, Cpu.IsInterrupted);
             StateHasChanged();
         }
     }
@@ -148,7 +157,7 @@
             await Step();
             StateHasChanged();
             await Task.Delay(1);
-        } while (Cpu.IsHalted == false && Cpu.IsErrored == false);
+        } while (Cpu.IsHalted == false && Cpu.IsInterrupted == false);
     }
 
     private async Task Submit()

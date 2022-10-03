@@ -12,6 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<AlphaChallengeService>();
+builder.Services.AddScoped<BetaChallengeService>();
 #if DEBUG
 builder.Services.AddDbContextFactory<WAContext>(options =>
 {

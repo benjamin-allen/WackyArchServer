@@ -1,8 +1,10 @@
 ﻿.filled-port-container {
-    min-width: 80px;
+    min-width: 100px;
     max-width: 120px;
+    max-height: 100%;
     display: flex;
     flex-flow: column;
+    overflow-y: hidden;
     /*border-left: 3px solid var(--fg-darkgray);
     border-right: 3px solid var(--fg-darkgray);
     border-bottom: 1px solid var(--fg-darkgray);
@@ -25,7 +27,6 @@
     border-right: 3px solid var(--fg-darkgray);
     border-bottom: 3px solid var(--fg-darkgray);
     border-top: 1px solid var(--fg-darkgray);
-    overflow-y: hidden;
 }
 
 .filled-port-content pre {

@@ -25,8 +25,8 @@
         </table>
     </div>
     <div id="memory-view-ports">
-        <div>@(Memory.Data.Name + ": " + Memory.Data.Data.Value + " (0x" + @Memory.Data.Data.ToHex() + ")")</div>
-        <div class="addr">@(Memory.Address.Name + ": " + Memory.Address.Data.Value + " (0x" + @Memory.Address.Data.ToHex() + ")")</div>
+        <div>@(Memory.Data.Name.ToUpper() + ": " + Memory.Data.Data.Value + " (0x" + @Memory.Data.Data.ToHex() + ")")</div>
+        <div class="addr">@(Memory.Address.Name.ToUpper() + ": " + Memory.Address.Data.Value + " (0x" + @Memory.Address.Data.ToHex() + ")")</div>
         <div class="pc">PC: @Cpu.GetPCValue() (0x@(new Word { Value = Cpu.GetPCValue()}.ToHex()))</div>
     </div>
 </div>
@@ -64,10 +64,10 @@
 
     public async Task EditCell(int cell)
     {
-        var newValue = await module.InvokeAsync<int?>("editCell");
-        if (newValue.HasValue)
+        var newValue = await module.InvokeAsync<int>("editCell");
+        if (newValue != 0xDEDBEEF)
         {
-            Memory.Words[cell] = new Word { Value = newValue.Value };
+            Memory.Words[cell] = new Word { Value = newValue };
             await OnMemoryChanged.InvokeAsync();
         }
     }

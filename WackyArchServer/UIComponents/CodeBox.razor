@@ -14,6 +14,12 @@
 
     private string infoMessage { get; set; } = "";
 
+    private bool mustSetText = false;
+    private string textToSet = "";
+
+    private bool mustUpdateLinePointer = false;
+    private int numberToPoint = 0;
+
 
     #region Ace Interop
     private IJSObjectReference module { get; set; }
@@ -28,6 +34,14 @@
             {
                 await module.InvokeVoidAsync("disable");
             }
+            if (mustSetText)
+            {
+                await SetText(textToSet);
+            }
+            if (mustUpdateLinePointer)
+            {
+                await SetLinePointer(numberToPoint, false);
+            }
         }
     }
 
@@ -38,7 +52,15 @@
 
     public async Task SetText(string text)
     {
-        await module.InvokeVoidAsync("setText", text);
+        if (module != null)
+        {
+            await module.InvokeVoidAsync("setText", text);
+        }
+        else
+        {
+            mustSetText = true;
+            textToSet = text;
+        }
     }
 
     /// <summary>
@@ -47,7 +69,15 @@
     /// </summary>
     public async Task SetLinePointer(int line, bool isError)
     {
-        await module.InvokeVoidAsync("setLinePointer", line, isError);
+        if (module != null)
+        {
+            await module.InvokeVoidAsync("setLinePointer", line, isError);
+        }
+        else
+        {
+            mustUpdateLinePointer = true;
+            numberToPoint = line;
+        }
     }
     #endregion
 
@@ -55,5 +85,6 @@
     public void SetInfoMessage(string infoMessage)
     {
         this.infoMessage = infoMessage;
+        StateHasChanged();
     }
 }

@@ -144,7 +144,7 @@ namespace WackyArchServer.Services
                             await context.SaveChangesAsync();
                             return $"Program interrupted unexpectedly: {runLog.Result}";
                         }
-                        if (cpu.IsErrored || cpu.IsHalted)
+                        if (cpu.IsInterrupted || cpu.IsHalted)
                         {
                             break;
                         }

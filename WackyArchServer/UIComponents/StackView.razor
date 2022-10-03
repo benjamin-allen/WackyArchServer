@@ -1,9 +1,9 @@
 ﻿<div id="stack-view-container">
     @for(int i = 0; i < Stack.MaxWords; i++)
     {
-        if (Stack.Words[i] != null)
+        if (Stack.Words[i] != null && i < Stack.SP)
         {
-            <div class="stack-item">@Stack.Words[i].Value</div>
+            <div class="stack-item">@Stack.Words[i].Value (0x@(Stack.Words[i].ToHex()))</div>
         }
         else if (i == Stack.SP)
         {
