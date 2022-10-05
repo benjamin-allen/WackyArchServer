@@ -290,7 +290,7 @@ namespace WackyArchServer.Migrations
                     b.ToTable("AlphaChallengeTests");
                 });
 
-            modelBuilder.Entity("WackyArchServer.Model.CompletedAlphaChallenges", b =>
+            modelBuilder.Entity("WackyArchServer.Model.CompletedChallenge", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -306,7 +306,7 @@ namespace WackyArchServer.Migrations
 
                     b.HasIndex("AlphaChallengeId");
 
-                    b.ToTable("CompletedAlphaChallenges");
+                    b.ToTable("CompletedChallenge");
                 });
 
             modelBuilder.Entity("WackyArchServer.Model.RunLog", b =>
@@ -411,7 +411,7 @@ namespace WackyArchServer.Migrations
                     b.Navigation("AlphaChallenge");
                 });
 
-            modelBuilder.Entity("WackyArchServer.Model.CompletedAlphaChallenges", b =>
+            modelBuilder.Entity("WackyArchServer.Model.CompletedChallenge", b =>
                 {
                     b.HasOne("WackyArchServer.Model.AlphaChallenge", "AlphaChallenge")
                         .WithMany()

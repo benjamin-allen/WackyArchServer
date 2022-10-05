@@ -41,7 +41,7 @@
 
 #cpuinfo-controls {
     width: 200px;
-    height: 170px;
+    height: 200px;
     border: 2px solid var(--fg-darkgray);
     background-color: var(--bg-green-light);
     color: var(--fg-darkgray);

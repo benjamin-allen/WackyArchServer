@@ -1,8 +1,11 @@
 ﻿<AuthorizeView>
     <Authorized>
+        <a href="/challenges">Challenges</a>
+        <a href="/alpha">Alpha Sandbox</a>
         <a href="Identity/Account/Manage">Logged in as  @context.User.Identity?.Name</a>
     </Authorized>
     <NotAuthorized>
+        <!-- Man, to hell with ASP.NET Authentication... -->
         <a href="Identity/Account/Login">Log in</a>
     </NotAuthorized>
 </AuthorizeView>

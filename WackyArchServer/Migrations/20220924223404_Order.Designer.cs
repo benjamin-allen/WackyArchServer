@@ -309,7 +309,7 @@ namespace WackyArchServer.Migrations
 
                     b.HasIndex("AlphaChallengeId");
 
-                    b.ToTable("CompletedAlphaChallenges");
+                    b.ToTable("CompletedChallenge");
                 });
 
             modelBuilder.Entity("WackyArchServer.Model.RunLog", b =>

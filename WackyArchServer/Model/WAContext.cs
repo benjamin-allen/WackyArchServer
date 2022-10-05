@@ -9,9 +9,8 @@ namespace WackyArchServer.Model
 
         public DbSet<AlphaChallenge> AlphaChallenges { get; set; }
         public DbSet<AlphaChallengeTest> AlphaChallengeTests { get; set; }
-        public DbSet<CompletedAlphaChallenge> CompletedAlphaChallenges { get; set; }
+        public DbSet<CompletedChallenge> CompletedChallenges { get; set; }
         public DbSet<RunLog> RunLogs { get; set; }
         public DbSet<BetaChallenge> BetaChallenges { get; set; }
-        public DbSet<CompletedBetaChallenge> CompletedBetaChallenges { get; set; }
     }
 }

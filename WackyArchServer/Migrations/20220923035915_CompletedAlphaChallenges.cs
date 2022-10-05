@@ -10,7 +10,7 @@ namespace WackyArchServer.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "CompletedAlphaChallenges",
+                name: "CompletedChallenge",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -30,14 +30,14 @@ namespace WackyArchServer.Migrations
 
             migrationBuilder.CreateIndex(
                 name: "IX_CompletedAlphaChallenges_AlphaChallengeId",
-                table: "CompletedAlphaChallenges",
+                table: "CompletedChallenge",
                 column: "AlphaChallengeId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "CompletedAlphaChallenges");
+                name: "CompletedChallenge");
         }
     }
 }

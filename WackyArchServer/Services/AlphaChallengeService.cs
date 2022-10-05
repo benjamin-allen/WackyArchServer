@@ -12,7 +12,7 @@ namespace WackyArchServer.Services
 {
     public class AlphaChallengeService
     {
-        public int AllowedCycles = 1_000_000;
+        public int AllowedCycles = 100_000;
         private readonly IDbContextFactory<WAContext> contextFactory;
         private readonly AuthenticationStateProvider authProvider;
 
@@ -30,13 +30,22 @@ namespace WackyArchServer.Services
             }
         }
 
-        public async Task<List<AlphaChallenge>> GetChallengesCompletedByUserAsync()
+        public async Task<List<Guid>> GetChallengesCompletedByUserAsync()
         {
             using (var context = await contextFactory.CreateDbContextAsync())
             {
                 var userId = (await authProvider.GetAuthenticationStateAsync()).User.GetUserId();
 
-                return await context.CompletedAlphaChallenges.Where(x => x.AccountId == Guid.Parse(userId)).Select(x => x.AlphaChallenge).ToListAsync();
+                return await context.CompletedChallenges.Where(x => x.AccountId == Guid.Parse(userId)).Select(x => x.ChallengeId).ToListAsync();
+            }
+        }
+
+        public async Task<List<AlphaChallenge>> GetAlphaChallengesCompletedByUserAsync()
+        {
+            using (var context = await contextFactory.CreateDbContextAsync())
+            {
+                var completedChallengeIds = (await GetChallengesCompletedByUserAsync()).ToHashSet();
+                return await context.AlphaChallenges.Where(x => completedChallengeIds.Contains(x.Id)).ToListAsync();
             }
         }
 
@@ -44,8 +53,8 @@ namespace WackyArchServer.Services
         {
             using (var context = await contextFactory.CreateDbContextAsync())
             {
-                var completedChallengeIds = (await GetChallengesCompletedByUserAsync()).Select(x => x.Id).ToHashSet();
-                var availableChallenges = await context.AlphaChallenges.Where(x => (x.Predecessor.Id == null) || completedChallengeIds.Contains(x.Predecessor.Id)).ToListAsync();
+                var completedChallengeIds = (await GetChallengesCompletedByUserAsync()).ToHashSet();
+                var availableChallenges = await context.AlphaChallenges.Where(x => (x.PredecessorId == null) || completedChallengeIds.Contains(x.PredecessorId.Value)).ToListAsync();
 
                 return availableChallenges.Where(x => completedChallengeIds.Contains(x.Id) == false).ToList();
             }
@@ -57,11 +66,11 @@ namespace WackyArchServer.Services
             {
                 var userId = (await authProvider.GetAuthenticationStateAsync()).User.GetUserId();
                 var alphaChallenge = await context.AlphaChallenges.SingleAsync(x => x.Id == alphaChallengeId);
-                var existingCompletionEntry = await context.CompletedAlphaChallenges.SingleOrDefaultAsync(x => x.AccountId == Guid.Parse(userId) && x.AlphaChallenge.Id == alphaChallengeId);
+                var existingCompletionEntry = await context.CompletedChallenges.SingleOrDefaultAsync(x => x.AccountId == Guid.Parse(userId) && x.ChallengeId == alphaChallengeId);
 
                 if (existingCompletionEntry == null)
                 {
-                    await context.CompletedAlphaChallenges.AddAsync(new CompletedAlphaChallenge { AccountId = Guid.Parse(userId), AlphaChallenge = alphaChallenge });
+                    await context.CompletedChallenges.AddAsync(new CompletedChallenge { AccountId = Guid.Parse(userId), ChallengeId = alphaChallenge.Id });
                     await context.SaveChangesAsync();
                 }
                 return;

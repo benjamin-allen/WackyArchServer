@@ -11,12 +11,10 @@
 	[] STYLING - WOOOO
 
 [] BUGS
+	[] #alpha-arch-container isn't fixed height. If there is too much port data it expands.
 
-[x] BetaChallengeService
-
-[] Get the thing into Azure
-	[] Step 1: Spin up an Azure DB and point the game to that.
-	[] Step 2: Spin up an Application Service and point the game to that.
+[] Home page with some Alice shit on it
+[] Manual Updates
 
 [] BETA Challenge Ideas
 	[] Just view disassembly to determine the outputs
@@ -27,5 +25,7 @@
 	[] Challenge where memory is write-protected (stack smashing)
 
 [] ALPHA Challenge Ideas
-	[] bit rotator, since the old one got removed
-	[] Signal interpreter? 5 input pipes, output the number of the pipe that that's 1 at this time
+	[x] bit rotator, since the old one got removed
+	[x] Signal interpreter? 5 input pipes, output the number of the pipe that that's 1 at this time
+	[] integrator: sum up the values in the pipe and report pairs of (direction of zero crossing, time) data out.
+	[] BCD comparator: Compare a BCD value to a binary value.

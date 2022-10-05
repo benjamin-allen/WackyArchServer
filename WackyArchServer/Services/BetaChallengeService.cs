@@ -29,13 +29,22 @@ namespace WackyArchServer.Services
             }
         }
 
-        public async Task<List<BetaChallenge>> GetBetaChallengesCompletedByUserAsync()
+        public async Task<List<Guid>> GetChallengesCompletedByUserAsync()
         {
             using (var context = await contextFactory.CreateDbContextAsync())
             {
                 var userId = (await authProvider.GetAuthenticationStateAsync()).User.GetUserId();
 
-                return await context.CompletedBetaChallenges.Where(x => x.AccountId == Guid.Parse(userId)).Select(x => x.BetaChallenge).ToListAsync();
+                return await context.CompletedChallenges.Where(x => x.AccountId == Guid.Parse(userId)).Select(x => x.ChallengeId).ToListAsync();
+            }
+        }
+
+        public async Task<List<BetaChallenge>> GetBetaChallengesCompletedByUserAsync()
+        {
+            using (var context = await contextFactory.CreateDbContextAsync())
+            {
+                var completedChallengeIds = (await GetChallengesCompletedByUserAsync()).ToHashSet();
+                return await context.BetaChallenges.Where(x => completedChallengeIds.Contains(x.Id)).ToListAsync();
             }
         }
 
@@ -43,8 +52,8 @@ namespace WackyArchServer.Services
         {
             using (var context = await contextFactory.CreateDbContextAsync())
             {
-                var completedchallengeIds = (await GetBetaChallengesCompletedByUserAsync()).Select(x => x.Id).ToHashSet();
-                var availableChallenges = await context.BetaChallenges.Where(x => (x.Predecessor.Id == null) || completedchallengeIds.Contains(x.Predecessor.Id)).ToListAsync();
+                var completedchallengeIds = (await GetChallengesCompletedByUserAsync()).ToHashSet();
+                var availableChallenges = await context.BetaChallenges.Where(x => (x.PredecessorId == null) || completedchallengeIds.Contains(x.PredecessorId.Value)).ToListAsync();
 
                 return availableChallenges.Where(x => completedchallengeIds.Contains(x.Id) == false).ToList();
             }
@@ -56,11 +65,11 @@ namespace WackyArchServer.Services
             {
                 var userId = (await authProvider.GetAuthenticationStateAsync()).User.GetUserId();
                 var betaChallenge = await context.BetaChallenges.SingleAsync(x => x.Id == betaChallengeId);
-                var existingCompletionEntry = await context.CompletedBetaChallenges.SingleOrDefaultAsync(x => x.AccountId == Guid.Parse(userId) && x.BetaChallenge.Id == betaChallengeId);
+                var existingCompletionEntry = await context.CompletedChallenges.SingleOrDefaultAsync(x => x.AccountId == Guid.Parse(userId) && x.ChallengeId == betaChallengeId);
 
                 if (existingCompletionEntry == null)
                 {
-                    await context.CompletedBetaChallenges.AddAsync(new CompletedBetaChallenge { AccountId = Guid.Parse(userId), BetaChallenge = betaChallenge });
+                    await context.CompletedChallenges.AddAsync(new CompletedChallenge { AccountId = Guid.Parse(userId), ChallengeId = betaChallenge.Id });
                     await context.SaveChangesAsync();
                 }
                 return;
@@ -77,7 +86,7 @@ namespace WackyArchServer.Services
             using (var context = await contextFactory.CreateDbContextAsync())
             {
                 var userId = (await authProvider.GetAuthenticationStateAsync()).User.GetUserId();
-                var runLog = new RunLog { ChallengeId = challengeId, Code = inputWords.Select(x => x.Value).ToString(), SubmitterAccountId = Guid.Parse(userId), SubmittedTime = DateTime.Now };
+                var runLog = new RunLog { ChallengeId = challengeId, Code = string.Join(", ", inputWords.Select(x => x.Value).ToList()), SubmitterAccountId = Guid.Parse(userId), SubmittedTime = DateTime.Now };
 
                 var challenge = await GetBetaChallengeAsync(challengeId);
                 if (challenge == null)

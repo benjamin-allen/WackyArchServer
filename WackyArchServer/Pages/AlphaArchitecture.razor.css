@@ -18,7 +18,8 @@
 #alpha-input-ports-container {
     width: 30%;
     display: flex;
-    flex-flow: row-reverse;
+    flex-flow: row;
+    justify-content: right;
     column-gap: 1em;
 }
 

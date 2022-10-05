@@ -60,7 +60,7 @@
     {
         // Get all the user's completed Challenges
         var availableAlphaChallenges = await alphaChallengeService.GetUncompletedAvailableChallengesForUserAsync();
-        var completedAlphaChallenges = await alphaChallengeService.GetChallengesCompletedByUserAsync();
+        var completedAlphaChallenges = await alphaChallengeService.GetAlphaChallengesCompletedByUserAsync();
         var allAlphaChallenges = new List<AlphaChallenge>().Concat(availableAlphaChallenges).Concat(completedAlphaChallenges);
 
         var availableBetaChallenges = await betaChallengeService.GetUncompletedAvailableBetaChallengesForUserAsync();

@@ -22,7 +22,7 @@
                 <CodeBox @ref="codeBox"></CodeBox>
             </div>
             <div id="alpha-center-cpuinfo">
-                <CPUInfo Cpu="Cpu" LoadButtonPressed="LoadProgram" ResetButtonPressed="Reset" StepButtonPressed="Step" RunButtonPressed="Run" SubmitButtonPressed="Submit" @ref="cpuInfo"></CPUInfo>
+                <CPUInfo Cpu="Cpu" LoadButtonPressed="LoadProgram" ResetButtonPressed="Reset" StepButtonPressed="async () => await Step(true)" RunButtonPressed="Run" RunFastButtonPressed="RunFast" SubmitButtonPressed="Submit" @ref="cpuInfo"></CPUInfo>
             </div>
         </div>
 
@@ -49,6 +49,7 @@
     private WackyArchServer.UIComponents.CodeBox codeBox;
     private WackyArchServer.UIComponents.CPUInfo cpuInfo;
     public string Description = "Loading challenge...";
+    private bool IsReset;
 
     [Inject]
     private AlphaChallengeService alphaChallengeService { get; set; }
@@ -70,7 +71,7 @@
         else
         {
             ChallengeId = challengeId;
-            var userCompletedChallenges = (await alphaChallengeService.GetChallengesCompletedByUserAsync()).Select(x => x.Id).ToHashSet();
+            var userCompletedChallenges = (await alphaChallengeService.GetChallengesCompletedByUserAsync()).ToHashSet();
             var userAvailableChallenges = (await alphaChallengeService.GetUncompletedAvailableChallengesForUserAsync()).Select(x => x.Id).ToHashSet();
             if (userCompletedChallenges.Contains(ChallengeId) || userAvailableChallenges.Contains(ChallengeId))
             {
@@ -112,16 +113,18 @@
 
     private async void Reset()
     {
+        IsReset = true;
         cyclables.ForEach(c => c.Reset());
         codeBox.SetInfoMessage("System Reset");
         StateHasChanged();
     }
 
-    private async Task Step()
+    private async Task Step(bool callStateHasChanged=true)
     {
+        IsReset = false;
         try
         {
-            codeBox.SetInfoMessage("");
+            //codeBox.SetInfoMessage("");
             cyclables.ForEach(c => c.Cycle());
             if (OutputPorts.All(o => o.ExpectedData.Count == 0))
             {
@@ -141,12 +144,22 @@
         {
             codeBox.SetInfoMessage(cex.ShortMessage);
             Cpu.IsInterrupted = true;
+            callStateHasChanged = true;
+        }
+        catch (Interrupt it)
+        {
+            codeBox.SetInfoMessage(it.InterruptType.ToString());
+            Cpu.IsInterrupted = true;
+            callStateHasChanged = true;
         }
         finally
         {
-            var isInLineMap = Cpu.PcLineMap.TryGetValue(Cpu.GetPCValue(), out int currentLine);
-            await codeBox.SetLinePointer(isInLineMap ? currentLine+1 : 0, Cpu.IsInterrupted);
-            StateHasChanged();
+            if (callStateHasChanged)
+            {
+                var isInLineMap = Cpu.PcLineMap.TryGetValue(Cpu.GetPCValue(), out int currentLine);
+                await codeBox.SetLinePointer(isInLineMap ? currentLine+1 : 0, Cpu.IsInterrupted);
+                StateHasChanged();
+            }
         }
     }
 
@@ -155,9 +168,21 @@
         do
         {
             await Step();
-            StateHasChanged();
             await Task.Delay(1);
-        } while (Cpu.IsHalted == false && Cpu.IsInterrupted == false);
+        } while (Cpu.IsHalted == false && Cpu.IsInterrupted == false && IsReset == false);
+    }
+
+    private async Task RunFast(object state)
+    {
+        do
+        {
+            for (int i = 0; i < 36; i++)
+            {
+                await Step(false);
+            }
+            await Step(true);
+            await Task.Delay(1);
+        } while (Cpu.IsHalted == false && Cpu.IsInterrupted == false && IsReset == false);
     }
 
     private async Task Submit()

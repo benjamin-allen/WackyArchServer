@@ -27,6 +27,10 @@
             <span class="oi oi-media-play"></span>
             Run
         </button>
+        <button @onclick="args => RunEvent(RunFastButtonPressed)" disabled=@runButtonDisabled>
+            <span class="oi oi-media-skip-forward"></span>
+            Run Fast
+        </button>
         <button @onclick="args => RunEvent(ResetButtonPressed)" disabled=@resetButtonDisabled>
             <span class="oi oi-reload"></span>
             Reset
@@ -38,7 +42,7 @@
     </div>
 </div>
 
-    @code {
+@code {
     [Parameter, EditorRequired]
     public CPU Cpu { get; set; }
 
@@ -50,6 +54,8 @@
     public EventCallback StepButtonPressed { get; set; }
     [Parameter]
     public EventCallback RunButtonPressed { get; set; }
+    [Parameter]
+    public EventCallback RunFastButtonPressed { get; set; }
     [Parameter]
     public EventCallback ResetButtonPressed { get; set; }
     [Parameter]

@@ -1,9 +1,9 @@
 ﻿namespace WackyArchServer.Model
 {
-    public class CompletedAlphaChallenge
+    public class CompletedChallenge
     {
         public Guid Id { get; set; }
         public Guid AccountId { get; set; }
-        public AlphaChallenge AlphaChallenge { get; set; }
+        public Guid ChallengeId { get; set; }
     }
 }

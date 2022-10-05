@@ -40,7 +40,7 @@
                 <CodeBox Disabled=@(!IsSandbox) @ref="codeBox"></CodeBox>
             </div>
             <div class="beta-center">
-                <CPUInfo @ref="cpuInfo" Cpu="Cpu" ShowLoadButton="@IsSandbox" LoadButtonPressed="Load" ResetButtonPressed="Reset" StepButtonPressed="Step" RunButtonPressed="Run" SubmitButtonPressed="Submit"></CPUInfo>
+                <CPUInfo @ref="cpuInfo" Cpu="Cpu" ShowLoadButton="@IsSandbox" LoadButtonPressed="Load" ResetButtonPressed="Reset" StepButtonPressed="async () => await Step(true)" RunButtonPressed="Run" RunFastButtonPressed="RunFast" SubmitButtonPressed="Submit"></CPUInfo>
             </div>
         </div>
         <div id="beta-arch-memory">
@@ -90,7 +90,7 @@
         else
         {
             ChallengeId = challengeId;
-            var userCompletedChallenges = (await betaChallengeService.GetBetaChallengesCompletedByUserAsync()).Select(x => x.Id).ToHashSet();
+            var userCompletedChallenges = (await betaChallengeService.GetChallengesCompletedByUserAsync()).ToHashSet();
             var userAvailableChallenges = (await betaChallengeService.GetUncompletedAvailableBetaChallengesForUserAsync()).Select(x => x.Id).ToHashSet();
             if (userCompletedChallenges.Contains(ChallengeId) || userAvailableChallenges.Contains(ChallengeId))
             {
@@ -167,7 +167,7 @@
         StateHasChanged();
     }
 
-    private async Task Step()
+    private async Task Step(bool callStateHasChanged=true)
     {
         IsReset = false;
         try
@@ -187,6 +187,7 @@
         {
             codeBox.SetInfoMessage(cex.ShortMessage);
             Cpu.IsInterrupted = true;
+            callStateHasChanged = true;
         }
         catch (Interrupt i)
         {
@@ -197,13 +198,17 @@
                 case InterruptType.HALT:
                     codeBox.SetInfoMessage("== Halted =="); break;
             }
+            callStateHasChanged = true;
             StateHasChanged();
         }
         finally
         {
             var isInLineMap = Cpu.PcLineMap.TryGetValue(Cpu.GetPCValue(), out int currentLine);
             await codeBox.SetLinePointer(isInLineMap ? currentLine+1 : 0, Cpu.IsInterrupted);
-            StateHasChanged();
+            if (callStateHasChanged)
+            {
+                StateHasChanged();
+            }
         }
     }
 
@@ -212,9 +217,20 @@
         do
         {
             await Step();
-            StateHasChanged();
             await Task.Delay(1);
         } while (Cpu.IsHalted == false && Cpu.IsInterrupted == false && IsReset == false);
+    }
+
+    private async Task RunFast(object state)
+    {
+        do
+        {
+            for(int i = 0; i < 37; i++)
+            {
+                await Step(false);
+            }
+            StateHasChanged();
+        } while (Cpu.IsHalted == false && Cpu.IsInterrupted == false && IsReset == false) ;
     }
 
     private async Task Submit()
