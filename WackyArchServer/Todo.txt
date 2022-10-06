@@ -10,6 +10,10 @@
 	[x] Input Box
 	[] STYLING - WOOOO
 
+vvvvvvvvvvvvvv
+!!!! [] Copy dev files to GIT
+^^^^^^^^^^^^^^
+
 [] BUGS
 	[] #alpha-arch-container isn't fixed height. If there is too much port data it expands.
 
@@ -17,15 +21,18 @@
 [] Manual Updates
 
 [] BETA Challenge Ideas
-	[] Just view disassembly to determine the outputs
-	[] Actually do the disassembly by sticking a 0x4FF at the beginning of the code, so they have to manually disassemble.
-	[] View disassembly and have to do some math or scripting on the side
-		[] CRC-8?
+	[x] Just view disassembly to determine the outputs
+	[x] Actually do the disassembly by sticking a 0x4FF at the beginning of the code, so they have to manually disassemble.
+	[x] View disassembly and have to do some math or scripting on the side
+		[x] CRC-8?
 	[] Challenge where they can write to memory
 	[] Challenge where memory is write-protected (stack smashing)
+		[] The program takes in data from the input pipe and adds it to the stack to reverse the contents of the pipe.
+		[] At some point earlier in the program, we've got a return value on the stack that will take us to UNLOCK
+		[] They need to overwrite the stack pointer
 
 [] ALPHA Challenge Ideas
 	[x] bit rotator, since the old one got removed
 	[x] Signal interpreter? 5 input pipes, output the number of the pipe that that's 1 at this time
 	[] integrator: sum up the values in the pipe and report pairs of (direction of zero crossing, time) data out.
-	[] BCD comparator: Compare a BCD value to a binary value.
+	[x] BCD comparator: Compare a BCD value to a binary value.

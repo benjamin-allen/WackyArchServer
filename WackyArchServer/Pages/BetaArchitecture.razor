@@ -114,14 +114,27 @@
 
     private async Task MemoryChanged()
     {
-        // Get binary and disassemble it
-        var binary = Disassembler.ShrinkBinary(Cpu.Memory.Words.ToList());
-        Cpu.Load(binary);
-        Cpu.Reset();
+        try
+        {
+            // Get binary and disassemble it
+            var binary = Disassembler.ShrinkBinary(Cpu.Memory.Words.ToList());
+            Cpu.Load(binary);
+            Cpu.Reset();
 
-        // Set the codebox text to the new code.
-        await codeBox.SetText(Cpu.ProgramText);
-        await codeBox.SetLinePointer(0, false);
+            // Set the codebox text to the new code.
+            await codeBox.SetText(Cpu.ProgramText);
+            await codeBox.SetLinePointer(0, false);
+            codeBox.SetInfoMessage("");
+        }
+        catch (AssemblerException ax)
+        {
+            codeBox.SetInfoMessage(ax.Message);
+            await codeBox.SetLinePointer(ax.LineNumber, true);
+        }
+        catch (ComponentException ex)
+        {
+            codeBox.SetInfoMessage(ex.Message);
+        }
     }
 
     private async Task Add(int i)
@@ -165,6 +178,7 @@
         codeBox.SetInfoMessage("System Reset");
         await MemoryChanged();
         StateHasChanged();
+        cpuInfo.DisableSubmitButton(false);
     }
 
     private async Task Step(bool callStateHasChanged=true)
@@ -214,6 +228,7 @@
 
     private async Task Run(object state)
     {
+        IsReset = false;
         do
         {
             await Step();
@@ -223,9 +238,10 @@
 
     private async Task RunFast(object state)
     {
+        IsReset = false;
         do
         {
-            for(int i = 0; i < 37; i++)
+            for(int i = 0; i < 37 && IsReset == false; i++)
             {
                 await Step(false);
             }
@@ -235,6 +251,7 @@
 
     private async Task Submit()
     {
+        await Reset();
         codeBox.SetInfoMessage("Submitted...");
         StateHasChanged();
 

@@ -7,6 +7,10 @@
         {
             <pre class="current-data">@Port.CurrentData?.Value <span class="oi oi-arrow-right"></span></pre>
         }
+        else if (Port.Pipe.Status == PipeStatus.AwaitingRead)
+        {
+            <pre class="current-data">@Port.Pipe.Data.Value <span class="oi oi-arrow-right"></span></pre>
+        }
         @foreach(Word data in Port.BacklogData)
         {
             <pre>@data.Value</pre>

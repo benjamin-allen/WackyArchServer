@@ -109,7 +109,7 @@ namespace WackyArchServer.Services
 
                 var tests = context.AlphaChallengeTests.Where(t => t.AlphaChallenge.Id.ToString() == challengeId.ToString()).ToList();
 
-                foreach (var test in tests)
+                foreach (var test in tests.OrderBy(t => t.InputTextJson.Length))
                 {
                     var inputPorts = GetInputPorts(test.InputTextJson);
                     var outputPorts = GetOutputPorts(test.OutputTextJson);
@@ -123,7 +123,8 @@ namespace WackyArchServer.Services
 
                     cpu.Load(programText);
 
-                    for (int i = 0; i < AllowedCycles; i++)
+                    int i = 0;
+                    for (; i < AllowedCycles; i++)
                     {
                         try
                         {
@@ -153,7 +154,7 @@ namespace WackyArchServer.Services
                             await context.SaveChangesAsync();
                             return $"Program interrupted unexpectedly: {runLog.Result}";
                         }
-                        if (cpu.IsInterrupted || cpu.IsHalted)
+                        if (cpu.IsInterrupted || cpu.IsHalted || outputPorts.All(x => x.ExpectedData.Count == 0))
                         {
                             break;
                         }
@@ -162,13 +163,22 @@ namespace WackyArchServer.Services
 
                     foreach (var outputPort in outputPorts)
                     {
-                        if (outputPort.ExpectedData.Count != 0)
+                        if (outputPort.ExpectedData.Count != 0 && i != AllowedCycles)
                         {
-                            runLog.Result = $"Test failure: Not all expected output was written to {outputPort.Name} or the program failed to finish in {AllowedCycles} cycles. Test ID {test.Id}.";
+                            runLog.Result = $"Test failure: Not all expected output was written to {outputPort.Name}. Test ID {test.Id}.";
                             runLog.CompletedTime = DateTime.Now;
                             context.RunLogs.Add(runLog);
                             await context.SaveChangesAsync();
-                            return $"Test failure: Not all expected output was written to {outputPort.Name} or the program failed to finish in {AllowedCycles} cycles. Test ID {test.Id}.";
+                            return $"Test failure: Not all expected output was written to {outputPort.Name}. Test ID {test.Id}.";
+                        }
+                        else if (outputPort.ExpectedData.Count != 0 && i == AllowedCycles)
+                        {
+                            runLog.Result = $"Test failure: The program failed to finish in {AllowedCycles} cycles. Test ID {test.Id}.";
+                            runLog.CompletedTime = DateTime.Now;
+                            context.RunLogs.Add(runLog);
+                            await context.SaveChangesAsync();
+                            return $"Test failure: The program failed to finish in {AllowedCycles} cycles. Test ID {test.Id}.";
+
                         }
                     }
                 }

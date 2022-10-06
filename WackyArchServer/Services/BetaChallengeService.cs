@@ -107,10 +107,10 @@ namespace WackyArchServer.Services
                 cpu.Load(programBinary);
 
                 string outputMessage = "";
-
+                int i = 0;
                 try
                 {
-                    for (int i = 0; i < AllowedCycles; i++)
+                    for (; i < AllowedCycles; i++)
                     {
                         cyclables.ForEach(c => c.Cycle());
                     }
