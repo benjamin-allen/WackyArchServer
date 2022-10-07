@@ -98,7 +98,9 @@
                 betaChallenge = await betaChallengeService.GetBetaChallengeAsync(ChallengeId);
                 var program = betaChallengeService.GetInputProgramBinary(betaChallenge.InputProgramJson);
                 Cpu.Load(program);
-                await MemoryChanged();
+                await codeBox.SetText(Cpu.ProgramText);
+                await codeBox.SetLinePointer(0, false);
+                codeBox.SetInfoMessage("");
                 Description = betaChallenge.Description;
             }
         }
@@ -171,19 +173,24 @@
 
     private async Task Reset()
     {
-        IsReset = true;
         UserInputPort.SetLoadedData(PreparedInput.Select(x => new Word { Value = x }).ToList());
         cyclables.ForEach(c => c.Reset());
 
-        codeBox.SetInfoMessage("System Reset");
         await MemoryChanged();
         StateHasChanged();
+        codeBox.SetInfoMessage("System Reset");
         cpuInfo.DisableSubmitButton(false);
+        IsReset = true;
     }
 
     private async Task Step(bool callStateHasChanged=true)
     {
         IsReset = false;
+        await StepWork(callStateHasChanged);
+    }
+
+    private async Task StepWork(bool callStateHasChanged=true)
+    {
         try
         {
             codeBox.SetInfoMessage("");
@@ -191,10 +198,6 @@
             if (Cpu.IsHalted)
             {
                 codeBox.SetInfoMessage("Program Complete");
-            }
-            else
-            {
-                codeBox.SetInfoMessage("Waiting for output...");
             }
         }
         catch (ComponentException cex)
@@ -231,9 +234,14 @@
         IsReset = false;
         do
         {
-            await Step();
+            await StepWork();
             await Task.Delay(1);
         } while (Cpu.IsHalted == false && Cpu.IsInterrupted == false && IsReset == false);
+        if(Cpu.IsInterrupted == false)
+        {
+            await Reset();
+        }
+        StateHasChanged();
     }
 
     private async Task RunFast(object state)
@@ -241,12 +249,29 @@
         IsReset = false;
         do
         {
-            for(int i = 0; i < 37 && IsReset == false; i++)
+            for (int i = 0; i < 36 && IsReset == false; i++)
             {
-                await Step(false);
-            }
+                try
+                {
+                    cyclables.ForEach(c => c.Cycle());
+                }
+                catch (ComponentException) {
+                    break;
+                }
+                catch (Interrupt it)
+                {
+                    break;
+                }
+            }   
+            await StepWork();
+            await Task.Delay(1);
             StateHasChanged();
-        } while (Cpu.IsHalted == false && Cpu.IsInterrupted == false && IsReset == false) ;
+        } while (Cpu.IsHalted == false && Cpu.IsInterrupted == false && IsReset == false);
+        if (Cpu.IsInterrupted == false)
+        {
+            await Reset();
+        }
+        StateHasChanged();
     }
 
     private async Task Submit()

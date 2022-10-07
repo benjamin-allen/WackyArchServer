@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using WackyArchServer.Model;
 using WackyArchServer.Services;
 using Microsoft.AspNetCore.Identity;
+using WackyArch.Utilities;
+using WackyArch.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,12 +15,10 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<AlphaChallengeService>();
 builder.Services.AddScoped<BetaChallengeService>();
-#if DEBUG
 builder.Services.AddDbContextFactory<WAContext>(options =>
 {
     options.UseSqlServer($"Server=localhost;Database=wackyarchserver;Trusted_Connection=True;");
 });
-#endif
 builder.Services.AddDefaultIdentity<IdentityUser>()
     .AddEntityFrameworkStores<WAContext>();
 builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();

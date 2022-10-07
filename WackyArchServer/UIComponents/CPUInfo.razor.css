@@ -41,7 +41,7 @@
 
 #cpuinfo-controls {
     width: 200px;
-    height: 200px;
+    height: 250px;
     border: 2px solid var(--fg-darkgray);
     background-color: var(--bg-green-light);
     color: var(--fg-darkgray);
@@ -49,7 +49,8 @@
 
 #cpuinfo-controls button {
     width: 80%;
-    margin-top: 0.3em;
+    height: 1.8em;
+    margin-top: 0.5em;
     margin-bottom: 0.4em;
     margin-left: auto;
     margin-right: auto;
@@ -74,15 +75,15 @@
 
 #cpuinfo-controls button:active {
     background-color: var(--bg-green-dark);
-    box-shadow: 0 1px #222;
-    transform: translateY(3px);
+    box-shadow: 0 2px #222;
+    transform: translateY(2px);
 }
 
 #cpuinfo-controls button:disabled {
     background-color: var(--fg-gray);
     color: var(--fg-darkgray);
-    transform: translateY(2px);
-    box-shadow: 0 2px; #222;
+    transform: translateY(1px);
+    box-shadow: 0 2px #222;
 }
 
 #cpuinfo-controls #bottom-button {

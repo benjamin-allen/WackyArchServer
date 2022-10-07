@@ -16,9 +16,10 @@ vvvvvvvvvvvvvv
 
 [] BUGS
 	[] #alpha-arch-container isn't fixed height. If there is too much port data it expands.
+	[x] A performance problem on server that isn't on local? Probably too many state updates
 
 [] Home page with some Alice shit on it
-[] Manual Updates
+[x] Manual Updates
 
 [] BETA Challenge Ideas
 	[x] Just view disassembly to determine the outputs

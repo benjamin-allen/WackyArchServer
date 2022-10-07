@@ -22,7 +22,6 @@ export function setAddrPointer(addr) {
 export function editCell() {
     let result = prompt("New cell value (Hex):", "000");
     let parsed = parseInt(result, 16);
-    debugger;
     if (isNaN(parsed) == false) {
         return parsed;
     }

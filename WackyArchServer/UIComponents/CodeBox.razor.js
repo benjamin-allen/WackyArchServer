@@ -13,7 +13,6 @@ export function getText() {
 }
 
 export function setText(text) {
-    debugger;
     editor.setReadOnly(false);
     editor.setValue(text);
     editor.setReadOnly(true);

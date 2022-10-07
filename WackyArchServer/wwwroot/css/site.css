@@ -101,3 +101,13 @@ a, .btn-link {
 a {
     font-weight: bold;
 }
+
+#queen {
+    height: 128px;
+    width: 128px;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    background-color: white;
+    border-radius: 30px;
+}

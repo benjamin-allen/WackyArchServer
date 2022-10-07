@@ -136,6 +136,11 @@ namespace WackyArchServer.Services
                     outputMessage = $"The program did not finish in {AllowedCycles} cycles.";
                 }
 
+                if (outputMessage == challenge.Flag)
+                {
+                    context.CompletedChallenges.Add(new CompletedChallenge { AccountId = Guid.Parse(userId), ChallengeId = challenge.Id });
+                }
+
                 runLog.Result = outputMessage;
                 runLog.CompletedTime = DateTime.Now;
                 context.RunLogs.Add(runLog);

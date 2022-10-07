@@ -122,6 +122,11 @@
     private async Task Step(bool callStateHasChanged=true)
     {
         IsReset = false;
+        StepWork(callStateHasChanged);
+    }
+
+    private async Task StepWork(bool callStateHasChanged=true)
+    {
         try
         {
             //codeBox.SetInfoMessage("");
@@ -163,14 +168,17 @@
         }
     }
 
+
     private async Task Run(object state)
     {
         IsReset = false;
         do
         {
-            await Step();
+            await StepWork();
             await Task.Delay(1);
         } while (Cpu.IsHalted == false && Cpu.IsInterrupted == false && IsReset == false);
+        await Reset();
+        StateHasChanged();
     }
 
     private async Task RunFast(object state)
@@ -180,11 +188,23 @@
         {
             for (int i = 0; i < 36; i++)
             {
-                await Step(false);
+                try
+                {
+                    cyclables.ForEach(c => c.Cycle());
+                }
+                catch (ComponentException) {
+                    break;
+                }
+                catch (Interrupt)
+                {
+                    break;
+                }
             }
-            await Step(true);
+            await StepWork(true);
             await Task.Delay(1);
         } while (Cpu.IsHalted == false && Cpu.IsInterrupted == false && IsReset == false);
+        await Reset();
+        StateHasChanged();
     }
 
     private async Task Submit()
