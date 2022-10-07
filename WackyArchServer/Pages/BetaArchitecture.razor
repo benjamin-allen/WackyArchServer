@@ -119,8 +119,15 @@
         try
         {
             // Get binary and disassemble it
-            var binary = Disassembler.ShrinkBinary(Cpu.Memory.Words.ToList());
-            Cpu.Load(binary);
+            if (betaChallenge.Id.ToString() != "a1be8727-1392-4b86-9b58-2f8458e5a0a3")
+            {
+                var binary = Disassembler.ShrinkBinary(Cpu.Memory.Words.ToList());
+                Cpu.Load(binary);
+            }
+            else
+            {
+                Cpu.Load(betaChallengeService.GetInputProgramBinary(betaChallenge.InputProgramJson));
+            }
             Cpu.Reset();
 
             // Set the codebox text to the new code.
