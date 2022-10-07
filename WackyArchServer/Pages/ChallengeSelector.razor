@@ -3,7 +3,7 @@
 @using WackyArchServer.Model
 
 <div id="alpha-challenges-container">
-    @foreach(var category in AlphaChallengesByCategory.Keys)
+    @foreach(var category in AlphaChallengesByCategory.Keys.OrderBy(x => x).ToList())
     {
         <div class="category-container">
             <div class="category-title">@category</div>
@@ -24,7 +24,7 @@
         </div>
     }
 
-    @foreach(var category in BetaChallengesByCategory.Keys)
+    @foreach(var category in BetaChallengesByCategory.Keys.OrderByDescending(x => x).ToList())
     {
         <div class="category-container">
             <div class="category-title">@category</div>
@@ -63,9 +63,22 @@
         var completedAlphaChallenges = await alphaChallengeService.GetAlphaChallengesCompletedByUserAsync();
         var allAlphaChallenges = new List<AlphaChallenge>().Concat(availableAlphaChallenges).Concat(completedAlphaChallenges);
 
-        var availableBetaChallenges = await betaChallengeService.GetUncompletedAvailableBetaChallengesForUserAsync();
-        var completedBetaChallenges = await betaChallengeService.GetBetaChallengesCompletedByUserAsync();
-        var allBetaChallenges = new List<BetaChallenge>().Concat(availableBetaChallenges).Concat(completedBetaChallenges);
+
+        List<BetaChallenge> availableBetaChallenges;
+        List<BetaChallenge> completedBetaChallenges;
+        IEnumerable<BetaChallenge> allBetaChallenges;
+        if (completedAlphaChallenges.Count > 7)
+        {
+            availableBetaChallenges = await betaChallengeService.GetUncompletedAvailableBetaChallengesForUserAsync();
+            completedBetaChallenges = await betaChallengeService.GetBetaChallengesCompletedByUserAsync();
+            allBetaChallenges = new List<BetaChallenge>().Concat(availableBetaChallenges).Concat(completedBetaChallenges);
+        }
+        else
+        {
+            availableBetaChallenges = new List<BetaChallenge>();
+            completedBetaChallenges = new List<BetaChallenge>();
+            allBetaChallenges = new List<BetaChallenge>();
+        }
 
         AlphaChallengesByCategory = allAlphaChallenges.GroupBy(x => x.Category).ToDictionary(k => k.Key, v => v.OrderBy(x => x.Order).ToList());
         BetaChallengesByCategory = allBetaChallenges.GroupBy(x => x.Category).ToDictionary(k => k.Key, v => v.OrderBy(x => x.Order).ToList());
